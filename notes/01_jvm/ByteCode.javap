@@ -1,0 +1,109 @@
+Compiled from "ByteCode.java"
+public class com.doudou.jvm.bytecode.ByteCode {
+  public com.doudou.jvm.bytecode.ByteCode();
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+       4: return
+
+  public static void main(java.lang.String[]);
+    Code:
+       // 入栈
+       0: bipush        15
+       // 存储到变量表 槽1
+       2: istore_1
+       // 将 5 入栈
+       3: iconst_5
+       // 存储到变量表 槽2
+       4: istore_2
+       // 变量表槽1数据移到栈顶
+       5: iload_1
+       // 变量表槽2数据移到栈顶
+       6: iload_2
+       // 相加
+       7: iadd
+       // 将结果移到变量表槽3
+       8: istore_3
+       9: iload_1
+      10: iload_2
+      // 相减
+      11: isub
+      // 将结果移到变量表槽4
+      12: istore        4
+      14: iload_1
+      15: iload_2
+      // 相乘
+      16: imul
+      // 将结果移到变量表槽5
+      17: istore        5
+      19: iload_1
+      20: iload_2
+      // 相乘
+      21: idiv
+      // 将结果移到变量表槽6
+      22: istore        6
+      // 将槽6数据移到栈顶
+      24: iload         6
+      // 将 3 入栈顶
+      26: iconst_3
+      // 比较 false -> 38
+      27: if_icmpne     38
+      30: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+      33: ldc           #3                  // String d == 3
+      35: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+      // 0 入栈顶
+      38: iconst_0
+      // 将栈顶数据移动到变量表槽7
+      39: istore        7
+      // 将槽7数据移到栈顶
+      41: iload         7
+      // 10 入栈
+      43: bipush        10
+      // 比较 if fasle -> 57
+      45: if_icmpge     57
+      // 自增1
+      48: iinc          1, 1
+      // 自增1
+      51: iinc          7, 1
+      // 跳转到 41
+      54: goto          41
+      // 调用 static 方法
+      57: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+      60: ldc           #5                  // String x = %d, y = %d, a = %d, b = %d, c = %d, d = %d
+      62: bipush        6
+      64: anewarray     #6                  // class java/lang/Object
+      // 下面是打印的语句
+      67: dup
+      68: iconst_0
+      69: iload_1
+      70: invokestatic  #7                  // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      73: aastore
+      74: dup
+      75: iconst_1
+      76: iload_2
+      77: invokestatic  #7                  // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      80: aastore
+      81: dup
+      82: iconst_2
+      83: iload_3
+      84: invokestatic  #7                  // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      87: aastore
+      88: dup
+      89: iconst_3
+      90: iload         4
+      92: invokestatic  #7                  // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      95: aastore
+      96: dup
+      97: iconst_4
+      98: iload         5
+     100: invokestatic  #7                  // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+     103: aastore
+     104: dup
+     105: iconst_5
+     106: iload         6
+     108: invokestatic  #7                  // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+     111: aastore
+     112: invokevirtual #8                  // Method java/io/PrintStream.printf:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintStream;
+     115: pop
+     116: return
+}
