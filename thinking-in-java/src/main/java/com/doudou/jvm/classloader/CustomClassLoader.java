@@ -13,6 +13,10 @@ public class CustomClassLoader extends ClassLoader {
         Object result = clazz.getDeclaredMethod("hello").invoke(obj);
 
         System.out.println(result);
+
+        // 默认父加载器 可以从 ClassLoader 的无参构造器得到答案
+        System.out.println(CustomClassLoader.getSystemClassLoader());
+        System.out.println(loader.getParent());
     }
 
     @Override

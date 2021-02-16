@@ -6,7 +6,7 @@ public class Singleton {
 
     public static int x;
 
-    public static int y = 2;
+    public static int y = 10;
 
     private Singleton() {
         x++;
@@ -16,5 +16,10 @@ public class Singleton {
 
     static {
         System.out.printf("Singleton static block x = %d, y =  %d\n", x, y);
+    }
+
+    {
+        y++;
+        System.out.printf("Singleton constructor block x = %d, y =  %d\n", x, y);
     }
 }
