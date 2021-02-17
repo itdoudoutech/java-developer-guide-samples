@@ -9,3 +9,4 @@
 + [字节码分析](https://github.com/coderlmm/java-developer-guide-samples/blob/main/docs/01_jvm/ByteCode.javap)
 + [CustomerClassLoader](https://github.com/coderlmm/java-developer-guide-samples/blob/main/thinking-in-java/src/main/java/com/doudou/jvm/classloader/CustomClassLoader.java)
 + [内存模型图](https://github.com/coderlmm/java-developer-guide-samples/blob/main/docs/01_jvm/jvm.png)
+![](https://raw.githubusercontent.com/coderlmm/java-developer-guide-samples/main/docs/01_jvm/jvm.png)
