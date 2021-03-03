@@ -1,1 +1,3 @@
 com.doudou.user.web.controller.HelloWorldController
+com.doudou.user.web.controller.RegisterViewController
+com.doudou.user.web.controller.RegisterSubmitController

@@ -7,15 +7,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
-/**
- * 输出 “Hello,World” Controller
- */
-@Path("/hello")
-public class HelloWorldController implements PageController {
+@Path("/register")
+public class RegisterViewController implements PageController {
 
     @GET
-    @Path("/world") // /hello/world -> HelloWorldController
     public String execute(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        return "index.jsp";
+        return "register.jsp";
     }
 }
