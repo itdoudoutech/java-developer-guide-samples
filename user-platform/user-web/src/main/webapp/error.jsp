@@ -4,9 +4,6 @@
 </head>
 <body style="text-align: center">
 	<div class="container-lg">
-		<h2>Welcome ${name}!</h2>
-		<p>
-			If you see this page,it means that your account has been created successfully.Congratulations to you!
-		</p>
+		<h2>Sorry, It's failed!</h2>
 	</div>
 </body>

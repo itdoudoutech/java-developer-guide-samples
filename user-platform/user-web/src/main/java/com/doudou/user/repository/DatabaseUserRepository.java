@@ -3,6 +3,7 @@ package com.doudou.user.repository;
 import com.doudou.function.ThrowableFunction;
 import com.doudou.user.domain.User;
 import com.doudou.user.sql.DBConnectionManager;
+import com.doudou.user.utils.BeanUtils;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -11,6 +12,7 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -27,13 +29,14 @@ public class DatabaseUserRepository implements UserRepository {
      */
     private static Consumer<Throwable> COMMON_EXCEPTION_HANDLER = e -> logger.log(Level.SEVERE, e.getMessage());
 
-    public static final String INSERT_USER_DML_SQL =
-            "INSERT INTO users(name,password,email,phoneNumber) VALUES " +
-                    "(?,?,?,?)";
+    private static final String INSERT_USER_DML_SQL = "INSERT INTO users VALUES (?, ?, ?, ?, ?)";
 
-    public static final String QUERY_ALL_USERS_DML_SQL = "SELECT id,name,password,email,phoneNumber FROM users";
-
+    public static final String QUERY_ALL_USERS_DML_SQL = "SELECT id, name, password, email, phoneNumber FROM users";
     private final DBConnectionManager dbConnectionManager;
+
+    public DatabaseUserRepository() {
+        this(new DBConnectionManager());
+    }
 
     public DatabaseUserRepository(DBConnectionManager dbConnectionManager) {
         this.dbConnectionManager = dbConnectionManager;
@@ -45,6 +48,17 @@ public class DatabaseUserRepository implements UserRepository {
 
     @Override
     public boolean save(User user) {
+        try {
+            PreparedStatement ps = getConnection().prepareStatement(INSERT_USER_DML_SQL);
+            ps.setLong(1, user.getId());
+            ps.setString(2, user.getName());
+            ps.setString(3, user.getPassword());
+            ps.setString(4, user.getEmail());
+            ps.setString(5, user.getPhoneNumber());
+            return ps.executeUpdate() == 1;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "insert user fail, msg = " + e.getMessage());
+        }
         return false;
     }
 
@@ -60,16 +74,35 @@ public class DatabaseUserRepository implements UserRepository {
 
     @Override
     public User getById(Long userId) {
+        try {
+            String sql = "SELECT id, name, password, email, phoneNumber FROM users WHERE id = ?";
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setLong(1, userId);
+            ResultSet resultSet = ps.executeQuery();
+            resultSet.next();
+            return BeanUtils.resultSetToBean(User.class, resultSet);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return null;
+       /* return executeQuery("SELECT id, name, password, email, phoneNumber FROM users WHERE id = ?",
+                resultSet -> {
+                    System.out.println("DatabaseUserRepository userId = " + userId);
+                    System.out.println(resultSet.next());
+                    while (resultSet.next()){
+                        System.out.println("BeanUtils id ==> " + resultSet.getLong("id"));
+                    }
+                    return BeanUtils.resultSetToBean(User.class, resultSet);
+                },
+                COMMON_EXCEPTION_HANDLER, userId);*/
     }
 
     @Override
     public User getByNameAndPassword(String userName, String password) {
-        return executeQuery("SELECT id,name,password,email,phoneNumber FROM users WHERE name=? and password=?",
-                resultSet -> {
-                    // TODO
-                    return new User();
-                }, COMMON_EXCEPTION_HANDLER, userName, password);
+        return executeQuery("SELECT id, name, password, email, phoneNumber FROM users WHERE name = ? and password = ?",
+                resultSet -> BeanUtils.resultSetToBean(User.class, resultSet),
+                COMMON_EXCEPTION_HANDLER, userName, password);
     }
 
     @Override
@@ -96,6 +129,7 @@ public class DatabaseUserRepository implements UserRepository {
                     // 以 id 为例，  user.setId(resultSet.getLong("id"));
                     setterMethodFromUser.invoke(user, resultValue);
                 }
+                users.add(user);
             }
             return users;
         }, e -> {
@@ -127,7 +161,7 @@ public class DatabaseUserRepository implements UserRepository {
                 // Boolean -> boolean
                 String methodName = preparedStatementMethodMappings.get(argType);
                 Method method = PreparedStatement.class.getMethod(methodName, wrapperType);
-                method.invoke(preparedStatement, i + 1, args);
+                method.invoke(preparedStatement, i + 1, arg);
             }
             ResultSet resultSet = preparedStatement.executeQuery();
             // 返回一个 POJO List -> ResultSet -> POJO List

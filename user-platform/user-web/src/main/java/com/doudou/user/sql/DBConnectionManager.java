@@ -12,20 +12,43 @@ import java.util.Map;
 
 public class DBConnectionManager {
 
-    private Connection connection;
+    private static Connection connection;
 
-    public void setConnection(Connection connection) {
-        this.connection = connection;
+    private final static String URL = "jdbc:h2:mem:~/user-platform;DB_CLOSE_DELAY=-1";
+    private final static String USERNAME = "sa";
+    private final static String PASSWORD = "sa";
+    private final static String DRIVER_CLASS_NAME = "org.h2.Driver";
+
+    private static final String DROP_USERS_TABLE = "DROP TABLE IF EXISTS users";
+    private static final String CREATE_USERS_TABLE = "CREATE TABLE IF NOT EXISTS users (" +
+            "id int(20) NOT NULL COMMENT 'primary key id'," +
+            "name varchar(64) NOT NULL COMMENT 'user name'," +
+            "password varchar(128) DEFAULT NULL COMMENT 'user password'," +
+            "email varchar(128) DEFAULT NULL COMMENT 'user email'," +
+            "phoneNumber varchar(128) DEFAULT NULL COMMENT 'user phoneNumber'," +
+            "PRIMARY KEY (id)" +
+            ");";
+
+    static {
+        try {
+            Class.forName(DRIVER_CLASS_NAME);
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(DROP_USERS_TABLE);
+            statement.executeUpdate(CREATE_USERS_TABLE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public Connection getConnection() {
-        return this.connection;
+        return connection;
     }
 
     public void releaseConnection() {
-        if (this.connection != null) {
+        if (connection != null) {
             try {
-                this.connection.close();
+                connection.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e.getCause());
             }
