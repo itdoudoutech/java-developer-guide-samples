@@ -1,6 +1,7 @@
 package com.doudou.user.repository;
 
 import com.doudou.function.ThrowableFunction;
+import com.doudou.user.context.ComponentContext;
 import com.doudou.user.domain.User;
 import com.doudou.user.sql.DBConnectionManager;
 import com.doudou.user.utils.BeanUtils;
@@ -12,7 +13,6 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -32,14 +32,11 @@ public class DatabaseUserRepository implements UserRepository {
     private static final String INSERT_USER_DML_SQL = "INSERT INTO users VALUES (?, ?, ?, ?, ?)";
 
     public static final String QUERY_ALL_USERS_DML_SQL = "SELECT id, name, password, email, phoneNumber FROM users";
+
     private final DBConnectionManager dbConnectionManager;
 
     public DatabaseUserRepository() {
-        this(new DBConnectionManager());
-    }
-
-    public DatabaseUserRepository(DBConnectionManager dbConnectionManager) {
-        this.dbConnectionManager = dbConnectionManager;
+        this.dbConnectionManager = ComponentContext.getInstance().getComponent("bean/DBConnectionManager");
     }
 
     private Connection getConnection() {

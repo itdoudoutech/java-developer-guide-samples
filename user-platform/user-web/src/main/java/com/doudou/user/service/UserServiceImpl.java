@@ -2,6 +2,7 @@ package com.doudou.user.service;
 
 import com.doudou.user.domain.User;
 import com.doudou.user.repository.UserRepository;
+import com.doudou.user.utils.Md5Utils;
 
 /**
  * 用户服务
@@ -16,6 +17,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean register(User user) {
+        String password = Md5Utils.encode(user.getPassword());
+        user.setPassword(password);
         return userRepository.save(user);
     }
 
