@@ -5,7 +5,11 @@ import com.doudou.user.repository.UserRepository;
 import com.doudou.user.utils.Md5Utils;
 
 import javax.annotation.Resource;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import java.util.Set;
 
 /**
  * 用户服务
@@ -20,6 +24,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean register(User user) {
+        // ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        // cache the factory somewhere
+        // javax.validation.Validator validator = factory.getValidator();
+        // 校验结果
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        if (violations.size() > 0) {
+            throw new RuntimeException(violations.iterator().next().getMessage());
+        }
+
         String password = Md5Utils.encode(user.getPassword());
         user.setPassword(password);
         return userRepository.save(user);

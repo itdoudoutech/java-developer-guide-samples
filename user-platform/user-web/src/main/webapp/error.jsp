@@ -4,6 +4,6 @@
 </head>
 <body style="text-align: center">
 	<div class="container-lg">
-		<h2>Sorry, It's failed!</h2>
+		<h2>Sorry, It's failed! ${msg}</h2>
 	</div>
 </body>

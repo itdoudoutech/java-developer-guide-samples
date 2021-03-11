@@ -28,7 +28,7 @@ public class User implements Serializable {
     private String name;
 
     @Column
-    @Size(min = 6, max = 32)
+    @Size(min = 6, max = 32, message = "密码长度需为6-32位")
     private String password;
 
     @Column

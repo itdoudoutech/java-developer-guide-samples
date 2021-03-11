@@ -33,14 +33,16 @@ public class RegisterSubmitController implements PageController {
         user.setPassword(password);
         user.setPhoneNumber(phone);
         user.setPhoneNumber(phone);
-        boolean result = userService.register(user);
-
-        if (result) {
-            User dbUser = userService.queryUserById(user.getId());
-            request.setAttribute("name", dbUser.getName());
-            logger.info("register success: " + dbUser);
+        try {
+            if(userService.register(user)){
+                User dbUser = userService.queryUserById(user.getId());
+                request.setAttribute("name", dbUser.getName());
+                logger.info("register success: " + dbUser);
+            }
+            return "success.jsp";
+        }catch (Exception e){
+            request.setAttribute("msg", e.getMessage());
         }
-
-        return result ? "success.jsp" : "error.jsp";
+        return "error.jsp";
     }
 }
