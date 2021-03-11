@@ -1,7 +1,7 @@
 package com.doudou.user.orm.jpa;
 
 
-import com.doudou.user.context.ComponentContext;
+import com.doudou.context.ComponentContext;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.*;

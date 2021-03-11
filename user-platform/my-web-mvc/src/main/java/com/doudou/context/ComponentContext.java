@@ -1,23 +1,14 @@
-package com.doudou.user.context;
+package com.doudou.context;
 
-import com.doudou.function.ThrowableAction;
+
 import com.doudou.function.ThrowableFunction;
-import com.doudou.user.sql.DBConnectionManager;
-import org.apache.commons.io.FileUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.naming.*;
 import javax.servlet.ServletContext;
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Modifier;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -74,26 +65,6 @@ public class ComponentContext {
         initEnvContext();
         instantiateComponents();
         initializeComponents();
-
-        // 初始化数据库
-        initDb();
-    }
-
-    private void initDb() throws RuntimeException {
-        DBConnectionManager dbConnectionManager = lookupComponent("bean/DBConnectionManager");
-        Connection connection = dbConnectionManager.getConnection();
-        try {
-            //获取文件的URL
-            URL url = this.getClass().getClassLoader().getResource("META-INF/schema.h2.sql");
-            String script = FileUtils.readFileToString(new File(url.getPath()), StandardCharsets.UTF_8);
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(script);
-
-            // logger.info("schema_h2 script: " + script);
-        } catch (IOException | SQLException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     /**

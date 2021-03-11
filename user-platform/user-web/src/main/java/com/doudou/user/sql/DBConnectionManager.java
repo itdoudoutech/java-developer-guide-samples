@@ -1,6 +1,6 @@
 package com.doudou.user.sql;
 
-import com.doudou.user.context.ComponentContext;
+import com.doudou.context.ComponentContext;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;

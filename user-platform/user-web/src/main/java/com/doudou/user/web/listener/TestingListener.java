@@ -1,7 +1,7 @@
 package com.doudou.user.web.listener;
 
 
-import com.doudou.user.context.ComponentContext;
+import com.doudou.context.ComponentContext;
 import com.doudou.user.domain.User;
 import com.doudou.user.sql.DBConnectionManager;
 

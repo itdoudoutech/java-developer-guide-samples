@@ -1,5 +1,6 @@
 package com.doudou;
 
+import com.doudou.context.ComponentContext;
 import com.doudou.controller.Controller;
 import com.doudou.controller.PageController;
 import com.doudou.controller.RestController;
@@ -116,14 +117,14 @@ public class FrontControllerServlet extends HttpServlet {
                 StringUtils.replace(prefixPath, "//", "/"));
         // 映射到 Controller
         Controller controller = controllersMapping.get(requestMappingPath);
-
         if (controller != null) {
+            Arrays.stream(controller.getClass().getDeclaredFields())
+                    .filter(field -> field.isAnnotationPresent(Resource.class))
+                    .forEach(field -> injectedField(controller, field));
 
             HandlerMethodInfo handlerMethodInfo = handleMethodInfoMapping.get(requestMappingPath);
-
             try {
                 if (handlerMethodInfo != null) {
-
                     String httpMethod = request.getMethod();
 
                     if (!handlerMethodInfo.getSupportedHttpMethods().contains(httpMethod)) {
@@ -146,25 +147,6 @@ public class FrontControllerServlet extends HttpServlet {
                         }
                         RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(viewPath);
                         requestDispatcher.forward(request, response);
-/*
-                        Field[] fields = controller.getClass().getDeclaredFields();
-                        for (Field field : fields) {
-                            if (field.isAnnotationPresent(Resource.class)){
-                                String resourceName = field.getAnnotation(Resource.class).name();
-                                Object injectedObject = null;
-                                field.setAccessible(true);
-                                try {
-                                    // 注入目标对象
-                                    field.set(controller, injectedObject);
-                                } catch (IllegalAccessException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }*/
-
-                        Arrays.stream(controller.getClass().getDeclaredFields())
-                                .filter(field -> field.isAnnotationPresent(Resource.class))
-                                .forEach(field -> injectedField(controller, field));
                         return;
                     } else if (controller instanceof RestController) {
                         // TODO
@@ -183,9 +165,10 @@ public class FrontControllerServlet extends HttpServlet {
     }
 
     private void injectedField(Controller controller, Field field) {
-        Object injectedObject = null;
-        field.setAccessible(true);
         try {
+            field.setAccessible(true);
+            Object injectedObject = ComponentContext.getInstance().
+                    getComponent(field.getAnnotation(Resource.class).name());
             // 注入目标对象
             field.set(controller, injectedObject);
         } catch (IllegalAccessException e) {

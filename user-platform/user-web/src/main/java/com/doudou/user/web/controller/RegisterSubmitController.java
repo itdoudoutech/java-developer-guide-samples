@@ -1,10 +1,10 @@
 package com.doudou.user.web.controller;
 
 import com.doudou.controller.PageController;
-import com.doudou.user.context.ComponentContext;
 import com.doudou.user.domain.User;
 import com.doudou.user.service.UserService;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
@@ -16,10 +16,8 @@ public class RegisterSubmitController implements PageController {
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
-    // @Resource(name = "bean/UserService")
-    // private UserService userService;
-
-    private UserService userService = ComponentContext.getInstance().getComponent("bean/UserService");
+    @Resource(name = "bean/UserService")
+    private UserService userService;
 
     @POST
     @Path("/submit")
