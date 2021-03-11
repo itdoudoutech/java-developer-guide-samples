@@ -4,16 +4,19 @@ import com.doudou.user.domain.User;
 import com.doudou.user.repository.UserRepository;
 import com.doudou.user.utils.Md5Utils;
 
+import javax.annotation.Resource;
+import javax.validation.Validator;
+
 /**
  * 用户服务
  */
 public class UserServiceImpl implements UserService {
 
+    @Resource(name = "bean/UserRepository")
     private UserRepository userRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    @Resource(name = "bean/Validator")
+    private Validator validator;
 
     @Override
     public boolean register(User user) {

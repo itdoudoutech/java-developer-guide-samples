@@ -5,6 +5,7 @@ import com.doudou.controller.PageController;
 import com.doudou.controller.RestController;
 import org.apache.commons.lang.StringUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -16,8 +17,11 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.substringAfter;
@@ -27,12 +31,12 @@ public class FrontControllerServlet extends HttpServlet {
     /**
      * 请求路径和 Controller 的映射关系缓存
      */
-    private Map<String, Controller> controllersMapping = new HashMap<>();
+    private final Map<String, Controller> controllersMapping = new HashMap<>();
 
     /**
      * 请求路径和 {@link HandlerMethodInfo} 映射关系缓存
      */
-    private Map<String, HandlerMethodInfo> handleMethodInfoMapping = new HashMap<>();
+    private final Map<String, HandlerMethodInfo> handleMethodInfoMapping = new HashMap<>();
 
     /**
      * 初始化 Servlet
@@ -142,6 +146,25 @@ public class FrontControllerServlet extends HttpServlet {
                         }
                         RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(viewPath);
                         requestDispatcher.forward(request, response);
+/*
+                        Field[] fields = controller.getClass().getDeclaredFields();
+                        for (Field field : fields) {
+                            if (field.isAnnotationPresent(Resource.class)){
+                                String resourceName = field.getAnnotation(Resource.class).name();
+                                Object injectedObject = null;
+                                field.setAccessible(true);
+                                try {
+                                    // 注入目标对象
+                                    field.set(controller, injectedObject);
+                                } catch (IllegalAccessException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }*/
+
+                        Arrays.stream(controller.getClass().getDeclaredFields())
+                                .filter(field -> field.isAnnotationPresent(Resource.class))
+                                .forEach(field -> injectedField(controller, field));
                         return;
                     } else if (controller instanceof RestController) {
                         // TODO
@@ -149,12 +172,24 @@ public class FrontControllerServlet extends HttpServlet {
 
                 }
             } catch (Throwable throwable) {
+                throwable.printStackTrace();
                 if (throwable.getCause() instanceof IOException) {
                     throw (IOException) throwable.getCause();
                 } else {
                     throw new ServletException(throwable.getCause());
                 }
             }
+        }
+    }
+
+    private void injectedField(Controller controller, Field field) {
+        Object injectedObject = null;
+        field.setAccessible(true);
+        try {
+            // 注入目标对象
+            field.set(controller, injectedObject);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
     }
 

@@ -1,22 +1,43 @@
 package com.doudou.user.domain;
 
+import com.doudou.user.validator.bean.validation.UserPhoneValid;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Objects;
+
+import static javax.persistence.GenerationType.AUTO;
 
 /**
  * 用户领域对象
  *
  * @since 1.0
  */
-public class User {
+@Entity
+@Table(name = "users")
+public class User implements Serializable {
 
+    @Id
+    @GeneratedValue(strategy = AUTO)
     private Long id;
 
+    @Column
     private String name;
 
+    @Column
+    @Size(min = 6, max = 32)
     private String password;
 
+    @Column
     private String email;
 
+    @Column
+    @NotNull
+    // @Pattern(regexp = "1[3|4|5|7|8][0-9]\\d{8}")
+    @UserPhoneValid
     private String phoneNumber;
 
     public Long getId() {
