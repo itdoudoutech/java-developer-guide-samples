@@ -82,6 +82,13 @@
             <version>${hibernate.validator.version}</version>
         </dependency>
 
+        <!-- MicroProfile -->
+        <dependency>
+            <groupId>org.eclipse.microprofile.config</groupId>
+            <artifactId>microprofile-config-api</artifactId>
+            <version>${microprofile-config-api.version}</version>
+        </dependency>
+
         <!--   <dependency>
                <groupId>javax.el</groupId>
                <artifactId>javax.el-api</artifactId>

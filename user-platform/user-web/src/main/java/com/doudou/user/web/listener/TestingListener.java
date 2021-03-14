@@ -4,12 +4,15 @@ package com.doudou.user.web.listener;
 import com.doudou.context.ComponentContext;
 import com.doudou.user.domain.User;
 import com.doudou.user.sql.DBConnectionManager;
+import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /**
  * 测试用途
@@ -17,7 +20,7 @@ import java.util.logging.Logger;
 @Deprecated
 public class TestingListener implements ServletContextListener {
 
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -28,6 +31,40 @@ public class TestingListener implements ServletContextListener {
         logger.info("所有的 JNDI 组件名称：[");
         context.getComponentNames().forEach(logger::info);
         logger.info("]");
+
+        // 读取配置
+        testMicroprofileConfig();
+    }
+
+    private void testMicroprofileConfig() {
+        logger.info("read config by microprofile.config:");
+        ConfigProviderResolver provider = ConfigProviderResolver.instance();
+
+        Config config = provider.getConfig();
+
+        String applicationName = config.getValue("application.name", String.class);
+
+        Byte byteValue = config.getValue("id", Byte.class);
+        Short shortValue = config.getValue("id", Short.class);
+        Character charValue = config.getValue("id", Character.class);
+
+        Integer integerValue = config.getValue("id", Integer.class);
+        Long longValue = config.getValue("id", Long.class);
+        Boolean debug = config.getValue("debug", Boolean.class);
+
+        Float floatValue = config.getValue("version", Float.class);
+        Double doubleValue = config.getValue("version", Double.class);
+
+        logger.info(String.format("converter string value [application.name = %s]", applicationName));
+        logger.info(String.format("converter byte value [id = %s]", byteValue));
+        logger.info(String.format("converter short value [id = %s]", shortValue));
+        logger.info(String.format("converter char value [id = %s]", charValue));
+        logger.info(String.format("converter int value [id = %s]", integerValue));
+        logger.info(String.format("converter long value [id = %s]", longValue));
+        logger.info(String.format("converter boolean value [debug switch = %s]", debug));
+        logger.info(String.format("converter float value [version = %s]", floatValue));
+        logger.info(String.format("converter double value [version = %s]", doubleValue));
+
     }
 
     private void testUser(EntityManager entityManager) {

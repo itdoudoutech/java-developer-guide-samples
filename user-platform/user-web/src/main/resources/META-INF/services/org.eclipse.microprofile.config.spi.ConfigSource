@@ -1,0 +1,3 @@
+com.doudou.configuration.microprofile.config.source.JavaSystemPropertiesConfigSource
+com.doudou.configuration.microprofile.config.source.JavaOSPropertiesConfigSource
+com.doudou.configuration.microprofile.config.source.JavaLocalPropertiesConfigSource
