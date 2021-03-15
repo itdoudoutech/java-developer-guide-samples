@@ -47,9 +47,8 @@ public class JavaConfig implements Config {
     @Override
     public <T> T getValue(String propertyName, Class<T> propertyType) {
         String propertyValue = getPropertyValue(propertyName);
-        // String 转换成目标类型
         Optional<Converter<T>> converter = getConverter(propertyType);
-        return converter.map(tConverter -> tConverter.convert(propertyValue)).orElse(null);
+        return converter.map(c -> c.convert(propertyValue)).orElse(null);
     }
 
     @Override
@@ -75,7 +74,9 @@ public class JavaConfig implements Config {
 
     @Override
     public Iterable<String> getPropertyNames() {
-        return null;
+        Set<String> propertyNames = new HashSet<>();
+        configSources.forEach(p -> propertyNames.addAll(p.getPropertyNames()));
+        return propertyNames;
     }
 
     @Override
