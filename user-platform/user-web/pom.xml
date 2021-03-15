@@ -89,6 +89,18 @@
             <version>${microprofile-config-api.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.jolokia</groupId>
+            <artifactId>jolokia-core</artifactId>
+            <version>${jolokia.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jolokia</groupId>
+            <artifactId>jolokia-client-java</artifactId>
+            <version>${jolokia.version}</version>
+        </dependency>
+
         <!--   <dependency>
                <groupId>javax.el</groupId>
                <artifactId>javax.el-api</artifactId>

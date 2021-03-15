@@ -3,16 +3,20 @@ package com.doudou.user.web.listener;
 
 import com.doudou.context.ComponentContext;
 import com.doudou.user.domain.User;
+import com.doudou.user.jmx.MBeanHelper;
+import com.doudou.user.jmx.UserManagement;
 import com.doudou.user.sql.DBConnectionManager;
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import java.lang.management.ManagementFactory;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 /**
  * 测试用途
@@ -34,6 +38,20 @@ public class TestingListener implements ServletContextListener {
 
         // 读取配置
         testMicroprofileConfig();
+
+        // 注册 MBean
+        registerMBean();
+    }
+
+    private void registerMBean() {
+        try {
+            MBeanHelper.registerMBean(new UserManagement(),
+                    new ObjectName("com.doudou.user.jmx:type=UserManagement"));
+            logger.info("registerMBean success...");
+        }catch (Exception e){
+            logger.info("registerMBean throw exception, msg = " + e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     private void testMicroprofileConfig() {
