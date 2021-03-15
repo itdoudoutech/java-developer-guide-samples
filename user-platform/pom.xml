@@ -6,17 +6,17 @@
 
     <groupId>com.doudou</groupId>
     <artifactId>user-platform</artifactId>
-    <name>User Platform ${revision}</name>
+    <name>user-platform-${revision}</name>
     <version>${revision}</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>my-web-mvc</module>
+        <module>mvc</module>
         <module>user-web</module>
     </modules>
 
     <properties>
-        <revision>v1-SNAPSHOT</revision>
+        <revision>v1</revision>
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>${file.encoding}</project.build.sourceEncoding>
 

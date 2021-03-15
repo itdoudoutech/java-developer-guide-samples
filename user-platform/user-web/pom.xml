@@ -11,13 +11,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>user-web</artifactId>
-    <name>User Web Application ${revision}</name>
+    <name>user-web-application-${revision}</name>
     <packaging>war</packaging>
 
     <dependencies>
         <dependency>
             <groupId>com.doudou</groupId>
-            <artifactId>my-web-mvc</artifactId>
+            <artifactId>mvc</artifactId>
             <version>${revision}</version>
         </dependency>
 
