@@ -1,11 +1,17 @@
+## 目录
+
++ [0x01：JNDI 获取数据源，自研 mvc 框架实现用户注册](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x01) 
++ [0x02：实现依赖注入和依赖查找，对密码和手机号进行格式校验](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x02)
++ [0x03：整合 Jolokia，扩展 microprofile config 的实现](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x03)
+
 ## 0x01
-#### 目标
+### 目标
 
 + 通过自研 Web MVC 框架实现（可以自己实现）一个用户注册，forward 到一个成功的页面（JSP 用法）/register
 + 通过 Controller -> Service -> Repository 实现（数据库实现）
 + JNDI 的方式获取数据库源（DataSource），然后获取 Connection
 
-#### 实现
+### 实现
 
 + 用户注册
 
@@ -29,7 +35,7 @@
 之后利用 `javax.servlet.ServletContextListener` 的监听机制，在容器初始化完成之后的回调函数 `ServletContextListener#contextInitialized` 中通过 `Context#lookup` 来查找数据源，保存到程序中使用即可。
 
 ## 0x02
-#### 目标
+### 目标
 
 + 通过依赖注入和依赖查找，完善 `0x01` 的用户注册功能
 + 通过 UserService 实现用户注册注册用户需要校验
@@ -37,7 +43,7 @@
   + 密码：6-32 位
   + 电话号码: 采用中国大陆方式（11 位校验）
 
-#### 实现
+### 实现
 
 + 依赖注入 & 依赖查找
 
@@ -100,7 +106,7 @@ public boolean register(User user) {
 ```
 
 ## 0x03
-#### 目标
+### 目标
 
 + 整合 [jolokia](https://jolokia.org/)，利用 Jolokia 通过 Servlet 代理自定义 JMX MBean
 + 完成 `org.eclipse.microprofile.config.Config` 中 API 的实现
@@ -109,7 +115,7 @@ public boolean register(User user) {
     + 通过 `org.eclipse.microprofile.config.Config` 读取当前应用名称
     + 应用名称 property name = “application.name”
 
-#### 实现
+### 实现
 
 + 整合 [jolokia](https://jolokia.org/)，利用 Jolokia 通过 Servlet 代理自定义 JMX MBean
 
