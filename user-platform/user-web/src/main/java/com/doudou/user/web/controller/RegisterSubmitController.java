@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 @Path("/register")
 public class RegisterSubmitController implements PageController {
 
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     @Resource(name = "bean/UserService")
     private UserService userService;
@@ -22,7 +22,6 @@ public class RegisterSubmitController implements PageController {
     @POST
     @Path("/submit")
     public String execute(HttpServletRequest request, HttpServletResponse response) {
-
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String phone = request.getParameter("phone");

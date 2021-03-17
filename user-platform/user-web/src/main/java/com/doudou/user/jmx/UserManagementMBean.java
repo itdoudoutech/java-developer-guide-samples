@@ -5,4 +5,6 @@ public interface UserManagementMBean {
     void setName(String name);
 
     String getName();
+
+    String toString();
 }

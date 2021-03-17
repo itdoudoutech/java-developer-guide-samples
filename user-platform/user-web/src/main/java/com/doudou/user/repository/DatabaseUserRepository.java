@@ -24,12 +24,12 @@ import static org.apache.commons.lang.ClassUtils.wrapperToPrimitive;
 
 public class DatabaseUserRepository implements UserRepository {
 
-    private static Logger logger = Logger.getLogger(DatabaseUserRepository.class.getName());
+    private static final Logger logger = Logger.getLogger(DatabaseUserRepository.class.getName());
 
     /**
      * 通用处理方式
      */
-    private static Consumer<Throwable> COMMON_EXCEPTION_HANDLER = e -> logger.log(Level.SEVERE, e.getMessage());
+    private static final Consumer<Throwable> COMMON_EXCEPTION_HANDLER = e -> logger.log(Level.SEVERE, e.getMessage());
 
     @Resource(name = "bean/DBConnectionManager")
     private DBConnectionManager dbConnectionManager;

@@ -19,4 +19,10 @@ public class UserManagement implements UserManagementMBean {
         logger.info("UserManagement getName method invoke: " + name);
         return name;
     }
+
+    @Override
+    public String toString() {
+        logger.info("UserManagement toString method invoke: " + name);
+        return name;
+    }
 }
