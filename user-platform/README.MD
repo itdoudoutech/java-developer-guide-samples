@@ -119,7 +119,7 @@ public boolean register(User user) {
 
 + 整合 [jolokia](https://jolokia.org/)，利用 Jolokia 通过 Servlet 代理自定义 JMX MBean
 
-引入 Manen 依赖：
+引入 Maven 依赖：
 
 ```xml
 <dependency>
@@ -309,15 +309,14 @@ com.doudou.configuration.microprofile.config.source.JavaLocalPropertiesConfigSou
 Converter 扩展：
 
 ```
-com.doudou.configuration.microprofile.config.converter.JavaStringConverter
-com.doudou.configuration.microprofile.config.converter.JavaByteConverter
-com.doudou.configuration.microprofile.config.converter.JavaShortConverter
-com.doudou.configuration.microprofile.config.converter.JavaCharacterConverter
-com.doudou.configuration.microprofile.config.converter.JavaIntegerConverter
-com.doudou.configuration.microprofile.config.converter.JavaLongConverter
-com.doudou.configuration.microprofile.config.converter.JavaFloatConverter
-com.doudou.configuration.microprofile.config.converter.JavaDoubleConverter
-com.doudou.configuration.microprofile.config.converter.JavaBooleanConverter
+com.doudou.configuration.microprofile.config.converter.StringConverter
+com.doudou.configuration.microprofile.config.converter.ByteConverter
+com.doudou.configuration.microprofile.config.converter.ShortConverter
+com.doudou.configuration.microprofile.config.converter.IntegerConverter
+com.doudou.configuration.microprofile.config.converter.LongConverter
+com.doudou.configuration.microprofile.config.converter.FloatConverter
+com.doudou.configuration.microprofile.config.converter.DoubleConverter
+com.doudou.configuration.microprofile.config.converter.BooleanConverter
 ```
 
 读取配置：
@@ -326,8 +325,11 @@ com.doudou.configuration.microprofile.config.converter.JavaBooleanConverter
 
 ```java
 ConfigProviderResolver provider = ConfigProviderResolver.instance();
-Config config = provider.getConfig();
-String applicationName = config.getValue("application.name", String.class);
+ConfigBuilder builder = provider.getBuilder();
+builder.addDefaultSources();
+builder.addDiscoveredConverters();
+Config config = builder.build();
 
+String applicationName = config.getValue("application.name", String.class);
 logger.info(String.format("converter string value [application.name = %s]", applicationName));
 ```

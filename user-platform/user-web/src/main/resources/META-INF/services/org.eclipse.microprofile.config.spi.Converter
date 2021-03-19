@@ -1,9 +1,8 @@
-com.doudou.configuration.microprofile.config.converter.JavaStringConverter
-com.doudou.configuration.microprofile.config.converter.JavaByteConverter
-com.doudou.configuration.microprofile.config.converter.JavaShortConverter
-com.doudou.configuration.microprofile.config.converter.JavaCharacterConverter
-com.doudou.configuration.microprofile.config.converter.JavaIntegerConverter
-com.doudou.configuration.microprofile.config.converter.JavaLongConverter
-com.doudou.configuration.microprofile.config.converter.JavaFloatConverter
-com.doudou.configuration.microprofile.config.converter.JavaDoubleConverter
-com.doudou.configuration.microprofile.config.converter.JavaBooleanConverter
+com.doudou.configuration.microprofile.config.converter.StringConverter
+com.doudou.configuration.microprofile.config.converter.ByteConverter
+com.doudou.configuration.microprofile.config.converter.ShortConverter
+com.doudou.configuration.microprofile.config.converter.IntegerConverter
+com.doudou.configuration.microprofile.config.converter.LongConverter
+com.doudou.configuration.microprofile.config.converter.FloatConverter
+com.doudou.configuration.microprofile.config.converter.DoubleConverter
+com.doudou.configuration.microprofile.config.converter.BooleanConverter

@@ -1,1 +1,1 @@
-com.doudou.configuration.microprofile.config.JavaEEConfigProviderResolver
+com.doudou.configuration.microprofile.config.DefaultConfigProviderResolver

@@ -1,37 +1,15 @@
 package com.doudou.configuration.microprofile.config.source;
 
-import org.eclipse.microprofile.config.spi.ConfigSource;
-
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-public class JavaOSPropertiesConfigSource implements ConfigSource {
-
-    private final Map<String, String> properties;
+public class JavaOSPropertiesConfigSource extends MapBaseConfigSource {
 
     public JavaOSPropertiesConfigSource() {
-        this.properties = new HashMap<>();
-        System.getenv().forEach((k, v) -> properties.put(k, k));
+        super("Java OS Properties", 100);
     }
 
     @Override
-    public Set<String> getPropertyNames() {
-        return properties.keySet();
-    }
-
-    @Override
-    public String getValue(String propertyName) {
-        return properties.get(propertyName);
-    }
-
-    @Override
-    public String getName() {
-        return "Java OS Properties";
-    }
-
-    @Override
-    public int getOrdinal() {
-        return 0;
+    protected void parseConfigData(Map configData) {
+        configData.putAll(System.getProperties());
     }
 }

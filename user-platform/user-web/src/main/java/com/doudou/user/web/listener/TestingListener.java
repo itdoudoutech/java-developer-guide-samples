@@ -7,6 +7,7 @@ import com.doudou.user.jmx.MBeanHelper;
 import com.doudou.user.jmx.UserManagement;
 import com.doudou.user.sql.DBConnectionManager;
 import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.spi.ConfigBuilder;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 
 import javax.management.MBeanServer;
@@ -48,7 +49,7 @@ public class TestingListener implements ServletContextListener {
             MBeanHelper.registerMBean(new UserManagement(),
                     new ObjectName("com.doudou.user.jmx:type=UserManagement"));
             logger.info("registerMBean success...");
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.info("registerMBean throw exception, msg = " + e.getMessage());
             throw new RuntimeException(e);
         }
@@ -57,14 +58,15 @@ public class TestingListener implements ServletContextListener {
     private void testMicroprofileConfig() {
         logger.info("read config by microprofile.config:");
         ConfigProviderResolver provider = ConfigProviderResolver.instance();
-
-        Config config = provider.getConfig();
+        ConfigBuilder builder = provider.getBuilder();
+        builder.addDefaultSources();
+        builder.addDiscoveredConverters();
+        Config config = builder.build();
 
         String applicationName = config.getValue("application.name", String.class);
 
         Byte byteValue = config.getValue("id", Byte.class);
         Short shortValue = config.getValue("id", Short.class);
-        Character charValue = config.getValue("id", Character.class);
 
         Integer integerValue = config.getValue("id", Integer.class);
         Long longValue = config.getValue("id", Long.class);
@@ -76,7 +78,6 @@ public class TestingListener implements ServletContextListener {
         logger.info(String.format("converter string value [application.name = %s]", applicationName));
         logger.info(String.format("converter byte value [id = %s]", byteValue));
         logger.info(String.format("converter short value [id = %s]", shortValue));
-        logger.info(String.format("converter char value [id = %s]", charValue));
         logger.info(String.format("converter int value [id = %s]", integerValue));
         logger.info(String.format("converter long value [id = %s]", longValue));
         logger.info(String.format("converter boolean value [debug switch = %s]", debug));
