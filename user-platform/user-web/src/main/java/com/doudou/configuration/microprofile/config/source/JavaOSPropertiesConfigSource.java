@@ -10,6 +10,7 @@ public class JavaOSPropertiesConfigSource extends MapBaseConfigSource {
 
     @Override
     protected void parseConfigData(Map configData) {
+        logger.info("Load config from OS properties success");
         configData.putAll(System.getProperties());
     }
 }

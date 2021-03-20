@@ -6,8 +6,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 public abstract class MapBaseConfigSource implements ConfigSource {
+
+    protected final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private final String name;
 

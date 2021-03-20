@@ -18,8 +18,14 @@ public class JavaLocalPropertiesConfigSource extends MapBaseConfigSource {
         try {
             Properties properties = new Properties();
             InputStream in = this.getClass().getClassLoader().getResourceAsStream(MICROPROFILE_CONFIG_FILE_URL);
+            if (in == null) {
+                logger.info("The default config file[META-INF/config.properties] can not be found");
+                return;
+            }
+
             properties.load(in);
             configData.putAll(properties);
+            logger.info("Load config from default config file[META-INF/config.properties] success");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

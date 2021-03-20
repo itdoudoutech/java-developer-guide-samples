@@ -15,8 +15,7 @@ public class JavaSystemPropertiesConfigSource extends MapBaseConfigSource {
 
     @Override
     protected void parseConfigData(Map configData) {
+        logger.info("Load config from java system properties success");
         configData.putAll(System.getProperties());
     }
-
-
 }
