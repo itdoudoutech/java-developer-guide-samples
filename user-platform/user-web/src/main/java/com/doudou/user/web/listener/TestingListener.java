@@ -10,13 +10,11 @@ import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigBuilder;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 
-import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.lang.management.ManagementFactory;
 import java.util.logging.Logger;
 
 /**
@@ -61,21 +59,26 @@ public class TestingListener implements ServletContextListener {
         ConfigBuilder builder = provider.getBuilder();
         builder.addDefaultSources();
         builder.addDiscoveredConverters();
-        Config config = builder.build();
 
-        String applicationName = config.getValue("application.name", String.class);
+        Config providerConfig = provider.getConfig();
+        Config buildConfig = builder.build();
 
-        Byte byteValue = config.getValue("id", Byte.class);
-        Short shortValue = config.getValue("id", Short.class);
+        String applicationNameKey = "application.name";
+        String applicationName = buildConfig.getValue(applicationNameKey, String.class);
+        String applicationNameByProviderConfig = providerConfig.getValue(applicationNameKey, String.class);
 
-        Integer integerValue = config.getValue("id", Integer.class);
-        Long longValue = config.getValue("id", Long.class);
-        Boolean debug = config.getValue("debug", Boolean.class);
+        Byte byteValue = buildConfig.getValue("id", Byte.class);
+        Short shortValue = buildConfig.getValue("id", Short.class);
 
-        Float floatValue = config.getValue("version", Float.class);
-        Double doubleValue = config.getValue("version", Double.class);
+        Integer integerValue = buildConfig.getValue("id", Integer.class);
+        Long longValue = buildConfig.getValue("id", Long.class);
+        Boolean debug = buildConfig.getValue("debug", Boolean.class);
+
+        Float floatValue = buildConfig.getValue("version", Float.class);
+        Double doubleValue = buildConfig.getValue("version", Double.class);
 
         logger.info(String.format("converter string value [application.name = %s]", applicationName));
+        logger.info(String.format("converter string value by providerConfig [application.name = %s]", applicationNameByProviderConfig));
         logger.info(String.format("converter byte value [id = %s]", byteValue));
         logger.info(String.format("converter short value [id = %s]", shortValue));
         logger.info(String.format("converter int value [id = %s]", integerValue));
@@ -83,7 +86,6 @@ public class TestingListener implements ServletContextListener {
         logger.info(String.format("converter boolean value [debug switch = %s]", debug));
         logger.info(String.format("converter float value [version = %s]", floatValue));
         logger.info(String.format("converter double value [version = %s]", doubleValue));
-
     }
 
     private void testUser(EntityManager entityManager) {

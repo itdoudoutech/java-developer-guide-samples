@@ -12,6 +12,8 @@ public class DefaultConfigProviderResolver extends ConfigProviderResolver {
 
     private final ConcurrentMap<ClassLoader, Config> configsRepository = new ConcurrentHashMap<>();
 
+    private final ConcurrentMap<ClassLoader, ConfigBuilder> configBuildersRepository = new ConcurrentHashMap<>();
+
     @Override
     public Config getConfig() {
         return getConfig(null);
@@ -44,7 +46,8 @@ public class DefaultConfigProviderResolver extends ConfigProviderResolver {
     }
 
     protected ConfigBuilder newConfigBuilder(ClassLoader classLoader) {
-        return new DefaultConfigBuilder(resolveClassLoader(classLoader));
+        final ClassLoader loader = resolveClassLoader(classLoader);
+        return configBuildersRepository.computeIfAbsent(loader, t -> new DefaultConfigBuilder(loader));
     }
 
     protected Config newConfig(ClassLoader classLoader) {
