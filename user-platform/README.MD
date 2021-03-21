@@ -341,8 +341,8 @@ logger.info(String.format("converter string value [application.name = %s]", appl
 + [x] 完善 dependency-injection 模块
    + 脱离 web.xml 配置实现 ComponentContext 自动初始化
    + 使用独立模块并且能够在 user-web 中运行成功
-+ [x] 完善 my-configuration 模块
-   + Config 对象如何能被 my-web-mvc 使用
++ [x] 完善 configuration 模块
+   + Config 对象如何能被 mvc 使用
    + 可能在 ServletContext 获取如何通过 ThreadLocal 获取
 
 ### 实现
@@ -361,7 +361,7 @@ public class WebAppServletContainerInitializer implements ServletContainerInitia
 }
 ```
 
-+ [x] 完善 my-configuration 模块
++ [x] 完善 configuration 模块
 
 抽离到 microprofile.config 到单独的模块「configuration」中，同样是依赖 SPI 机制加载 `ServletContainerInitializer` 的实现类，在 `onStartup` 初始化 `ConfigProviderResolver`。
 
