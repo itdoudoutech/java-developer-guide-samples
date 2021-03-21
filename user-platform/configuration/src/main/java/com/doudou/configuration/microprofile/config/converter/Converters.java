@@ -56,11 +56,8 @@ public class Converters implements Iterable<Converter> {
     public void addConverter(Converter converter, int priority, Class<?> convertedType) {
         PriorityQueue<PrioritizedConverter> prioritizedConverters = typedConverters.computeIfAbsent(convertedType, p -> new PriorityQueue<>());
         prioritizedConverters.offer(new PrioritizedConverter(converter, priority));
-
-        logger.info("addConverters");
-        typedConverters.forEach((k, v) -> {
-            v.forEach(p -> logger.info(k + " : " + p.getConverter().getClass().getSimpleName()));
-        });
+        logger.info(String.format("add converter: convertedType = %s, converterName = %s",
+                converter.getClass().getSimpleName(), converter.getClass().getSimpleName()));
     }
 
     public void addConverters(Converter... converters) {

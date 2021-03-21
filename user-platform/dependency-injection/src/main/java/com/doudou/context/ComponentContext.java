@@ -1,7 +1,7 @@
 package com.doudou.context;
 
 
-import com.doudou.function.ThrowableFunction;
+import com.doudou.context.function.ThrowableFunction;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

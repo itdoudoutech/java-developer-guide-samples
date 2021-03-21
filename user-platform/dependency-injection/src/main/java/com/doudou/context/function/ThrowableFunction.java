@@ -1,4 +1,4 @@
-package com.doudou.function;
+package com.doudou.context.function;
 
 @FunctionalInterface
 public interface ThrowableFunction<T, R> {

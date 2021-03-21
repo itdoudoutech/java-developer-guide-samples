@@ -5,7 +5,7 @@ import java.util.Map;
 public class JavaOSPropertiesConfigSource extends MapBaseConfigSource {
 
     public JavaOSPropertiesConfigSource() {
-        super("Java OS Properties", 100);
+        super("Java OS Properties Config Source", 100);
     }
 
     @Override

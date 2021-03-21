@@ -10,7 +10,7 @@ public class JavaSystemPropertiesConfigSource extends MapBaseConfigSource {
      */
 
     public JavaSystemPropertiesConfigSource() {
-        super("Java System Properties", 200);
+        super("Java System Properties Config Source", 200);
     }
 
     @Override

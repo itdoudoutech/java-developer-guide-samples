@@ -1,6 +1,6 @@
 package com.doudou.user.repository;
 
-import com.doudou.function.ThrowableFunction;
+import com.doudou.context.function.ThrowableFunction;
 import com.doudou.user.domain.User;
 import com.doudou.user.sql.DBConnectionManager;
 import com.doudou.user.utils.BeanUtils;

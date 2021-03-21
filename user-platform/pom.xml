@@ -12,6 +12,8 @@
 
     <modules>
         <module>mvc</module>
+        <module>configuration</module>
+        <module>dependency-injection</module>
         <module>user-web</module>
     </modules>
 

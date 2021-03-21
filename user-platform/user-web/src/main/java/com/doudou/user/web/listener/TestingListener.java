@@ -56,12 +56,9 @@ public class TestingListener implements ServletContextListener {
     private void testMicroprofileConfig() {
         logger.info("read config by microprofile.config:");
         ConfigProviderResolver provider = ConfigProviderResolver.instance();
-        ConfigBuilder builder = provider.getBuilder();
-        builder.addDefaultSources();
-        builder.addDiscoveredConverters();
 
         Config providerConfig = provider.getConfig();
-        Config buildConfig = builder.build();
+        Config buildConfig = provider.getBuilder().build();
 
         String applicationNameKey = "application.name";
         String applicationName = buildConfig.getValue(applicationNameKey, String.class);

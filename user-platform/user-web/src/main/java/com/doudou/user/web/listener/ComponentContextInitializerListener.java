@@ -27,8 +27,8 @@ public class ComponentContextInitializerListener implements ServletContextListen
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         this.servletContext = sce.getServletContext();
-        ComponentContext context = new ComponentContext();
-        context.init(servletContext);
+        // ComponentContext context = new ComponentContext();
+        // context.init(servletContext);
         // 初始化数据库
         initDb();
     }

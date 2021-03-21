@@ -10,18 +10,16 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mvc</artifactId>
-    <name>mvc-framework-${revision}</name>
+    <artifactId>dependency-injection</artifactId>
+    <name>dependency-injection-framework-${revision}</name>
     <packaging>jar</packaging>
 
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
 
     <dependencies>
-
-        <dependency>
-            <groupId>com.doudou</groupId>
-            <artifactId>dependency-injection</artifactId>
-            <version>${revision}</version>
-        </dependency>
 
         <!-- Servlet API -->
         <dependency>
@@ -30,15 +28,14 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- JAX-RS API -->
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-        </dependency>
     </dependencies>
+
 </project>

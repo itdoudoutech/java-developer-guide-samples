@@ -10,7 +10,7 @@ public class JavaLocalPropertiesConfigSource extends MapBaseConfigSource {
     private static final String MICROPROFILE_CONFIG_FILE_URL = "META-INF/config.properties";
 
     public JavaLocalPropertiesConfigSource() {
-        super("Java Local Properties", 300);
+        super("Java Local Properties Config Source", 300);
     }
 
     @Override

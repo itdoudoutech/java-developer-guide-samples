@@ -5,6 +5,12 @@
          http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          metadata-complete="true" version="2.5">
 
+    <!-- ServletContext 配置参数 -->
+    <context-param>
+        <param-name>application.name</param-name>
+        <param-value>user-web-platform</param-value>
+    </context-param>
+
     <!-- 请确保这个 Listener 放置在首位 -->
     <listener>
         <listener-class>com.doudou.user.web.listener.ComponentContextInitializerListener</listener-class>
@@ -13,7 +19,6 @@
     <listener>
         <listener-class>com.doudou.user.web.listener.TestingListener</listener-class>
     </listener>
-
 
     <servlet>
         <servlet-name>default</servlet-name>

@@ -53,9 +53,11 @@ public class ConfigSources implements Iterable<ConfigSource> {
     }
 
     public void addConfigSources(Iterable<ConfigSource> configSources) {
-        configSources.forEach(this.configSources::add);
+        configSources.forEach(p -> {
+            logger.info("add ConfigSources: " + p.getName());
+            this.configSources.add(p);
+        });
         this.configSources.sort(ConfigSourceOrdinalComparator.INSTANCE);
-        this.configSources.forEach(p -> logger.info("addConfigSources: " + p.getName()));
     }
 
     @Override

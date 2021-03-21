@@ -15,9 +15,16 @@
     <packaging>war</packaging>
 
     <dependencies>
+
         <dependency>
             <groupId>com.doudou</groupId>
             <artifactId>mvc</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.doudou</groupId>
+            <artifactId>configuration</artifactId>
             <version>${revision}</version>
         </dependency>
 

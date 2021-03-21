@@ -10,17 +10,22 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mvc</artifactId>
-    <name>mvc-framework-${revision}</name>
+    <artifactId>configuration</artifactId>
+    <name>configuration-framework-${revision}</name>
     <packaging>jar</packaging>
 
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
 
     <dependencies>
 
+        <!-- MicroProfile -->
         <dependency>
-            <groupId>com.doudou</groupId>
-            <artifactId>dependency-injection</artifactId>
-            <version>${revision}</version>
+            <groupId>org.eclipse.microprofile.config</groupId>
+            <artifactId>microprofile-config-api</artifactId>
+            <version>${microprofile-config-api.version}</version>
         </dependency>
 
         <!-- Servlet API -->
@@ -30,15 +35,14 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- JAX-RS API -->
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-        </dependency>
     </dependencies>
+
 </project>

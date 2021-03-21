@@ -12,8 +12,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Logger;
 
 public class DefaultConfig implements Config {
+
+    protected final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private final ConfigSources configSources;
     private final Converters converters;
@@ -39,6 +42,7 @@ public class DefaultConfig implements Config {
         for (ConfigSource configSource : configSources) {
             String propertyValue = configSource.getValue(propertyName);
             if (propertyValue != null) {
+                logger.info("load property[" + propertyName + "] value from [" + configSource.getName() + "]");
                 return propertyValue;
             }
         }
