@@ -1,24 +1,25 @@
 ## 目录
 
-+ [0x01：自研 MVC 框架实现用户注册，以 JNDI 方式获取数据源](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x01) 
-+ [0x02：实现依赖注入和依赖查找，对密码和手机号进行格式校验](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x02)
-+ [0x03：整合 Jolokia，扩展 microprofile config 的实现](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x03)
++ [0x00：自研 MVC 框架实现用户注册，以 JNDI 方式获取数据源](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x00) 
++ [0x01：实现依赖注入和依赖查找，对密码和手机号进行格式校验](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x01)
++ [0x02：整合 Jolokia，扩展 microprofile config 的实现](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x02)
++ [0x03：完善 DI & configuration 模块，使其脱离 web.xml](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x03)
 
-## 0x01
+## 0x00
 ### 目标
 
 + [x] 通过自研 Web MVC 框架实现（可以自己实现）一个用户注册，forward 到一个成功的页面（JSP 用法）/register
-+ [x]  通过 Controller -> Service -> Repository 实现（数据库实现）
-+ [x]  JNDI 的方式获取数据库源（DataSource），然后获取 Connection
++ [x] 通过 Controller -> Service -> Repository 实现（数据库实现）
++ [x] JNDI 的方式获取数据库源（DataSource），然后获取 Connection
 
 ### 实现
 
-+ 用户注册
++ [x] 用户注册
 
 `com.doudou.user.web.controller.RegisterViewController` 为注册页面跳转 servlet，通过 `/register` 跳转至 `register.jsp`。
 `com.doudou.user.web.controller.RegisterSubmitController` 为注册j接口所在 servlet，通过 `/submit` 来提交注册信息（用户名 & 密码）
 
-+ 数据源实现
++ [x] 数据源实现
 
 `user-platform/user-web/src/main/webapp/META-INF/context.xml` 配置文件中添加如下配置：
 
@@ -34,18 +35,18 @@
 
 之后利用 `javax.servlet.ServletContextListener` 的监听机制，在容器初始化完成之后的回调函数 `ServletContextListener#contextInitialized` 中通过 `Context#lookup` 来查找数据源，保存到程序中使用即可。
 
-## 0x02
+## 0x01
 ### 目标
 
 + [x]  通过依赖注入和依赖查找，完善 `0x01` 的用户注册功能
 + [x]  通过 UserService 实现用户注册注册用户需要校验
-  + Id：必须大于 0 的整数
-  + 密码：6-32 位
-  + 电话号码: 采用中国大陆方式（11 位校验）
+   + Id：必须大于 0 的整数
+   + 密码：6-32 位
+   + 电话号码: 采用中国大陆方式（11 位校验）
 
 ### 实现
 
-+ 依赖注入 & 依赖查找
++ [x] 依赖注入 & 依赖查找
 
 首先所有的组件都需要在 `context.xml` 中进行声明。
 
@@ -65,7 +66,7 @@
 
 好比如一般情况下 controller 作为顶层组件是不会被其他组件依赖的，但是 controller 会依赖 service，所以 controller 也许要声明才行，不染 service 没有办法自动注入到 controller 中。
 
-+ 数据校验
++ [x] 数据校验
 
 ```java
 public class User implements Serializable {
@@ -105,7 +106,7 @@ public boolean register(User user) {
 }
 ```
 
-## 0x03
+## 0x02
 ### 目标
 
 + [x]  整合 [jolokia](https://jolokia.org/)，利用 Jolokia 通过 Servlet 代理自定义 JMX MBean
@@ -117,7 +118,7 @@ public boolean register(User user) {
 
 ### 实现
 
-+ 整合 [jolokia](https://jolokia.org/)，利用 Jolokia 通过 Servlet 代理自定义 JMX MBean
++ [x] 整合 [jolokia](https://jolokia.org/)，利用 Jolokia 通过 Servlet 代理自定义 JMX MBean
 
 引入 Maven 依赖：
 
@@ -289,7 +290,7 @@ curl http://localhost:8080/jolokia/exec/com.doudou.user.jmx:type\=UserManagement
 }
 ```
 
-+ 完成 Microprofile Config API 的实现
++ [x] 完成 Microprofile Config API 的实现
 
 这个点就是要应用 Java 的 SPI 机制来进行扩展实现。
 
@@ -332,4 +333,54 @@ Config config = builder.build();
 
 String applicationName = config.getValue("application.name", String.class);
 logger.info(String.format("converter string value [application.name = %s]", applicationName));
+```
+
+## 0x03
+### 目标
+
++ [x] 完善 dependency-injection 模块
+   + 脱离 web.xml 配置实现 ComponentContext 自动初始化
+   + 使用独立模块并且能够在 user-web 中运行成功
++ [x] 完善 my-configuration 模块
+   + Config 对象如何能被 my-web-mvc 使用
+   + 可能在 ServletContext 获取如何通过 ThreadLocal 获取
+
+### 实现
+
++ [x] 完善 dependency-injection 模块
+
+抽离 `ComponentContext` 到单独的 module「dependency-injection」中，通过 SPI 机制加载 `ServletContainerInitializer` 的实现类，在 `onStartup` 方法中初始化 `ComponentContext` 即可。
+
+```java
+public class WebAppServletContainerInitializer implements ServletContainerInitializer {
+    @Override
+    public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
+        ComponentContext context = new ComponentContext();
+        context.init(servletContext);
+    }
+}
+```
+
++ [x] 完善 my-configuration 模块
+
+抽离到 microprofile.config 到单独的模块「configuration」中，同样是依赖 SPI 机制加载 `ServletContainerInitializer` 的实现类，在 `onStartup` 初始化 `ConfigProviderResolver`。
+
+```java
+public class ConfigSourcesInitializer implements ServletContainerInitializer {
+    @Override
+    public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
+        ClassLoader classLoader = servletContext.getClassLoader();
+        ConfigProviderResolver provider = ConfigProviderResolver.instance();
+        ConfigBuilder builder = provider.getBuilder();
+        // 同步 ClassLoader
+        builder.forClassLoader(classLoader);
+        // 配置 ConfigSource
+        builder.addDefaultSources();
+        builder.withSources(new ServletContextConfigSource(servletContext));
+        // 配置 Converter
+        builder.addDiscoveredConverters();
+        // 注册 Config
+        provider.registerConfig(builder.build(), classLoader);
+    }
+}
 ```

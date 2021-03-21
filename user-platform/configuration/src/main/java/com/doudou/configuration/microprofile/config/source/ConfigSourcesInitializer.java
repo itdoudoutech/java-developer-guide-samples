@@ -14,7 +14,6 @@ public class ConfigSourcesInitializer implements ServletContainerInitializer {
 
     @Override
     public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
-        ServletContextConfigSource servletContextConfigSource = new ServletContextConfigSource(servletContext);
         ClassLoader classLoader = servletContext.getClassLoader();
         ConfigProviderResolver provider = ConfigProviderResolver.instance();
         ConfigBuilder builder = provider.getBuilder();
@@ -22,7 +21,7 @@ public class ConfigSourcesInitializer implements ServletContainerInitializer {
         builder.forClassLoader(classLoader);
         // 配置 ConfigSource
         builder.addDefaultSources();
-        builder.withSources(servletContextConfigSource);
+        builder.withSources(new ServletContextConfigSource(servletContext));
         // 配置 Converter
         builder.addDiscoveredConverters();
         // 注册 Config
