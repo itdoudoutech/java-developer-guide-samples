@@ -343,7 +343,8 @@ logger.info(String.format("converter string value [application.name = %s]", appl
    + 使用独立模块并且能够在 user-web 中运行成功
 + [x] 完善 configuration 模块
    + Config 对象如何能被 mvc 使用
-   + 可能在 ServletContext 获取如何通过 ThreadLocal 获取
+     + 如何在 ServletContext 中获取
+     + 如何通过 ThreadLocal 获取
 
 ### 实现
 
