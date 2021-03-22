@@ -16,18 +16,12 @@ public abstract class MapBaseConfigSource implements ConfigSource {
 
     private final int ordinal;
 
-    protected final Map<String, String> data = new HashMap<>();
+    private final Map<String, String> data;
 
     public MapBaseConfigSource(String name, int ordinal) {
-        this(name, ordinal, false);
-    }
-
-    public MapBaseConfigSource(String name, int ordinal, boolean lazyLoad) {
         this.name = name;
         this.ordinal = ordinal;
-        if(!lazyLoad) {
-            this.data.putAll(getProperties());
-        }
+        this.data = getProperties();
     }
 
     protected abstract void parseConfigData(Map configData);

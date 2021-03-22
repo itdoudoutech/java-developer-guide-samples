@@ -8,22 +8,21 @@ import java.util.Map;
 
 public class ServletContextConfigSource extends MapBaseConfigSource {
 
-    // TODO 这里不可以通过构造方法传入 servletContext
-    // 暂时用 lazyLoad 解决
-    private final ServletContext servletContext;
+    private Map<String, String> data;
 
     public ServletContextConfigSource(ServletContext servletContext) {
-        super("Servlet Context Config Source", 400, true);
-        this.servletContext = servletContext;
-        parseConfigData(super.data);
+        super("Servlet Context Config Source", 400);
+
+        Enumeration<String> initParameterNames = servletContext.getInitParameterNames();
+        while (initParameterNames.hasMoreElements()) {
+            String parameterName = initParameterNames.nextElement();
+            data.put(parameterName, servletContext.getInitParameter(parameterName));
+        }
+        data = null;
     }
 
     @Override
     protected void parseConfigData(Map configData) {
-        Enumeration<String> initParameterNames = servletContext.getInitParameterNames();
-        while (initParameterNames.hasMoreElements()) {
-            String parameterName = initParameterNames.nextElement();
-            configData.put(parameterName, servletContext.getInitParameter(parameterName));
-        }
+        this.data = configData;
     }
 }
