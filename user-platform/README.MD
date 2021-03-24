@@ -350,7 +350,7 @@ logger.info(String.format("converter string value [application.name = %s]", appl
 
 + [x] 完善 dependency-injection 模块
 
-抽离 `ComponentContext` 到单独的 module「dependency-injection」中，通过 SPI 机制加载 `ServletContainerInitializer` 的实现类，在 `onStartup` 方法中初始化 `ComponentContext` 即可。
+抽离 ComponentContext 到单独的 module「dependency-injection」中，通过 SPI 机制加载 ServletContainerInitializer 的实现类，在 onStartup 方法中初始化 ComponentContext 即可。
 
 ```java
 public class WebApplicationServletContainerInitializer implements ServletContainerInitializer {
@@ -364,8 +364,8 @@ public class WebApplicationServletContainerInitializer implements ServletContain
 
 + [x] 完善 configuration 模块
 
-抽离到 microprofile.config 到单独的模块「configuration」中，同样是依赖 SPI 机制加载 `ServletContainerInitializer` 的实现类，
-在 `onStartup` 中动态添加 `ServletContextListener`。
+抽离 microprofile.config 到单独的模块「configuration」中，同样是依赖 SPI 机制加载 ServletContainerInitializer 的实现类，
+在 onStartup 中动态添加 ServletContextListener。
 
 ```java
 public class ConfigSourcesInitializer implements ServletContainerInitializer {
@@ -405,7 +405,7 @@ public class ConfigSourceInitializeListener implements ServletContextListener {
 }
 ```
 
-但是在 `ConfigSourceInitializeListener#contextInitialized` 中试图获取 classLoader 时出现了 `UnsupportedOperationException`。
+但是在 `ConfigSourceInitializeListener#contextInitialized` 中试图获取 classLoader 时出现了 `UnsupportedOperationException`
 
 ```java
 java.lang.UnsupportedOperationException: Servlet 3.0规范的第4.4节不允许从未在web.xml，web-fragment.xml文件中定义或未用@WebListener注释的ServletContextListener调用此方法。
@@ -417,7 +417,7 @@ java.lang.UnsupportedOperationException: Servlet 3.0规范的第4.4节不允许�
 
 > If the ServletContext passed to the ServletContextListener’s contextInitialized method where the ServletContextListener was neither declared in web.xml or web-fragment.xml nor annotated with @WebListener then an UnsupportedOperationException MUST be thrown for all the methods defined in ServletContext for programmatic configuration of servlets, filters and listeners.
 
-简言之就是如果一个 ServletContextListener 不是通过 web.xml 和 `@WebListener` 添加到 Servlet 容器的，那么在 `ServletContextListener#contextInitialized` 方法中调用 ServletContext的任何犯方法都必须抛出 UnsupportedOperationException。
+简言之就是如果一个 ServletContextListener 不是通过 web.xml 和 `@WebListener` 添加到 Servlet 容器的，那么在 `ServletContextListener#contextInitialized` 方法中调用 ServletContext 的任何犯方法都必须抛出 `UnsupportedOperationException`
 
 解决方案：
 
