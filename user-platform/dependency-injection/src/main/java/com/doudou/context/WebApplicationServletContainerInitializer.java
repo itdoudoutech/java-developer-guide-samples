@@ -6,7 +6,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import java.util.Set;
 
-public class WebAppServletContainerInitializer implements ServletContainerInitializer {
+public class WebApplicationServletContainerInitializer implements ServletContainerInitializer {
 
     @Override
     public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {

@@ -1,0 +1,2 @@
+com.doudou.user.web.listener.WebApplicationInitializerListener
+com.doudou.user.web.listener.TestingListener

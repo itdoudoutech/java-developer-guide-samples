@@ -21,6 +21,12 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>com.doudou</groupId>
+            <artifactId>dependency-injection</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
         <!-- MicroProfile -->
         <dependency>
             <groupId>org.eclipse.microprofile.config</groupId>

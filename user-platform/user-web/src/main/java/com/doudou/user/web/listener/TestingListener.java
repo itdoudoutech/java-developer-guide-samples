@@ -2,6 +2,7 @@ package com.doudou.user.web.listener;
 
 
 import com.doudou.context.ComponentContext;
+import com.doudou.context.WebApplicationContextListener;
 import com.doudou.user.domain.User;
 import com.doudou.user.jmx.MBeanHelper;
 import com.doudou.user.jmx.UserManagement;
@@ -10,6 +11,7 @@ import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigBuilder;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 
+import javax.annotation.Priority;
 import javax.management.ObjectName;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -21,7 +23,8 @@ import java.util.logging.Logger;
  * 测试用途
  */
 @Deprecated
-public class TestingListener implements ServletContextListener {
+@Priority(value = 10)
+public class TestingListener implements WebApplicationContextListener {
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 

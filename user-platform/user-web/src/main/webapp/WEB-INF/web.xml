@@ -11,13 +11,8 @@
         <param-value>user-web-platform</param-value>
     </context-param>
 
-    <!-- 请确保这个 Listener 放置在首位 -->
     <listener>
-        <listener-class>com.doudou.user.web.listener.ComponentContextInitializerListener</listener-class>
-    </listener>
-
-    <listener>
-        <listener-class>com.doudou.user.web.listener.TestingListener</listener-class>
+        <listener-class>com.doudou.context.WebApplicationContextListenerInitializer</listener-class>
     </listener>
 
     <servlet>

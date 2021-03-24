@@ -64,7 +64,7 @@
 
 至此，完成了依赖注入和依赖查找。但是有一个问题就是，所有组件都需要在 `context.xml` 中进行声明，即使没有其他组件依赖自身，但只要自身依赖了其他组件，也需要声明。
 
-好比如一般情况下 controller 作为顶层组件是不会被其他组件依赖的，但是 controller 会依赖 service，所以 controller 也许要声明才行，不染 service 没有办法自动注入到 controller 中。
+好比如一般情况下 controller 作为顶层组件是不会被其他组件依赖的，但是 controller 会依赖 service，所以 controller 也需要声明才行，不然 service 没有办法自动注入到 controller 中。
 
 + [x] 数据校验
 
@@ -353,7 +353,7 @@ logger.info(String.format("converter string value [application.name = %s]", appl
 抽离 `ComponentContext` 到单独的 module「dependency-injection」中，通过 SPI 机制加载 `ServletContainerInitializer` 的实现类，在 `onStartup` 方法中初始化 `ComponentContext` 即可。
 
 ```java
-public class WebAppServletContainerInitializer implements ServletContainerInitializer {
+public class WebApplicationServletContainerInitializer implements ServletContainerInitializer {
     @Override
     public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
         ComponentContext context = new ComponentContext();
@@ -364,12 +364,24 @@ public class WebAppServletContainerInitializer implements ServletContainerInitia
 
 + [x] 完善 configuration 模块
 
-抽离到 microprofile.config 到单独的模块「configuration」中，同样是依赖 SPI 机制加载 `ServletContainerInitializer` 的实现类，在 `onStartup` 初始化 `ConfigProviderResolver`。
+抽离到 microprofile.config 到单独的模块「configuration」中，同样是依赖 SPI 机制加载 `ServletContainerInitializer` 的实现类，
+在 `onStartup` 中动态添加 `ServletContextListener`。
 
 ```java
 public class ConfigSourcesInitializer implements ServletContainerInitializer {
     @Override
     public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
+        servletContext.addListener(ConfigSourceInitializeListener.class);
+    }
+}
+```
+
+```java
+public class ConfigSourceInitializeListener implements ServletContextListener {
+
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        ServletContext servletContext = sce.getServletContext();
         ClassLoader classLoader = servletContext.getClassLoader();
         ConfigProviderResolver provider = ConfigProviderResolver.instance();
         ConfigBuilder builder = provider.getBuilder();
@@ -377,11 +389,146 @@ public class ConfigSourcesInitializer implements ServletContainerInitializer {
         builder.forClassLoader(classLoader);
         // 配置 ConfigSource
         builder.addDefaultSources();
+        builder.addDiscoveredSources();
+        builder.withSources(new ServletContextConfigSource(servletContext));
+        // 配置 Converter
+        builder.addDiscoveredConverters();
+        // 注册 Config
+        provider.registerConfig(builder.build(), classLoader);
+        
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+
+    }
+}
+```
+
+但是在 `ConfigSourceInitializeListener#contextInitialized` 中试图获取 classLoader 时出现了 `UnsupportedOperationException`。
+
+```java
+java.lang.UnsupportedOperationException: Servlet 3.0规范的第4.4节不允许从未在web.xml，web-fragment.xml文件中定义或未用@WebListener注释的ServletContextListener调用此方法。
+  at org.apache.catalina.core.StandardContext$NoPluggabilityServletContext.getClassLoader(StandardContext.java:7275)
+  at com.doudou.context.ConfigSourceInitializeListener.contextInitialized(ConfigSourceInitializeListener.java:18)
+```
+
+查看 Servlet 3.0 规范，发现如下描述：
+
+> If the ServletContext passed to the ServletContextListener’s contextInitialized method where the ServletContextListener was neither declared in web.xml or web-fragment.xml nor annotated with @WebListener then an UnsupportedOperationException MUST be thrown for all the methods defined in ServletContext for programmatic configuration of servlets, filters and listeners.
+
+简言之就是如果一个 ServletContextListener 不是通过 web.xml 和 `@WebListener` 添加到 Servlet 容器的，那么在 `ServletContextListener#contextInitialized` 方法中调用 ServletContext的任何犯方法都必须抛出 UnsupportedOperationException。
+
+解决方案：
+
+在 DI 模块中自定义 WebApplicationContextListener 来代替 ServletContextListener
+
+```java
+/**
+ * 替代 ServletContextListener
+ */
+public interface WebApplicationContextListener {
+
+    /**
+     * init
+     *
+     * @param sce ServletContextEvent
+     */
+    void contextInitialized(ServletContextEvent sce);
+
+    /**
+     * destroy
+     *
+     * @param sce ServletContextEvent
+     */
+    void contextDestroyed(ServletContextEvent sce);
+}
+```
+
+定义 WebApplicationContextListenerInitializer 用于初始化所有的 WebApplicationContextListener，在该类中通过 SPI 获取到所有的自定义 Listener，之后通过其对应的注解 Priority 进行排序，数值越小优先级越高，最后通过 contextListener.contextInitialized(sce) 继续将事件分发下去。
+
+```java
+public class WebApplicationContextListenerInitializer implements ServletContextListener {
+
+    protected final Logger logger = Logger.getLogger(this.getClass().getName());
+
+    private final static List<WebApplicationContextListener> contextListeners = new ArrayList<>();
+
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        ServiceLoader<WebApplicationContextListener> webApplicationContextListeners
+                = ServiceLoader.load(WebApplicationContextListener.class);
+        webApplicationContextListeners.forEach(contextListeners::add);
+        contextListeners.sort(WebApplicationContextListenerOrdinalComparator.INSTANCE);
+
+        // 分发 WebApplicationContextListener
+        for (WebApplicationContextListener contextListener : contextListeners) {
+            contextListener.contextInitialized(sce);
+            logger.info(contextListener.getClass().getSimpleName() + "Listener contextInitialized success");
+        }
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        for (int i = contextListeners.size() - 1; i >= 0; i--) {
+            contextListeners.get(i).contextDestroyed(sce);
+        }
+    }
+}
+```
+
+WebApplicationContextListener 优先级比较器
+
+```java
+public class WebApplicationContextListenerOrdinalComparator implements Comparator<WebApplicationContextListener> {
+
+    public static final Comparator<WebApplicationContextListener> INSTANCE = new WebApplicationContextListenerOrdinalComparator();
+
+    private WebApplicationContextListenerOrdinalComparator() {
+    }
+
+    @Override
+    public int compare(WebApplicationContextListener o1, WebApplicationContextListener o2) {
+        Priority priorityOne = o1.getClass().getAnnotation(Priority.class);
+        Priority priorityTwo = o2.getClass().getAnnotation(Priority.class);
+        int valueOne = null == priorityOne ? 0 : priorityOne.value();
+        int valueTwo = null == priorityTwo ? 0 : priorityTwo.value();
+        return Integer.compare(valueOne, valueTwo);
+    }
+}
+```
+
+如何使用：
+
+```java
+@Priority(value = 1)
+public class ConfigSourceInitializeListener implements WebApplicationContextListener {
+
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        ServletContext servletContext = sce.getServletContext();
+        ClassLoader classLoader = servletContext.getClassLoader();
+        ConfigProviderResolver provider = ConfigProviderResolver.instance();
+        ConfigBuilder builder = provider.getBuilder();
+        // 同步 ClassLoader
+        builder.forClassLoader(classLoader);
+        // 配置 ConfigSource
+        builder.addDefaultSources();
+        builder.addDiscoveredSources();
         builder.withSources(new ServletContextConfigSource(servletContext));
         // 配置 Converter
         builder.addDiscoveredConverters();
         // 注册 Config
         provider.registerConfig(builder.build(), classLoader);
     }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+
+    }
 }
 ```
+
+
+
+
