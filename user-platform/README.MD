@@ -445,7 +445,7 @@ public interface WebApplicationContextListener {
 }
 ```
 
-定义 WebApplicationContextListenerInitializer 用于初始化所有的 WebApplicationContextListener，在该类中通过 SPI 获取到所有的自定义 Listener，之后通过其对应的注解 Priority 进行排序，数值越小优先级越高，最后通过 contextListener.contextInitialized(sce) 继续将事件分发下去。
+定义 WebApplicationContextListenerInitializer 用于初始化所有的 WebApplicationContextListener，在该类中通过 SPI 获取到所有的自定义 Listener，之后通过其对应的注解 Priority 进行排序，数值越小优先级越高，最后通过 `WebApplicationContextListener#contextInitialized` 继续将事件分发下去。
 
 ```java
 public class WebApplicationContextListenerInitializer implements ServletContextListener {
@@ -477,7 +477,7 @@ public class WebApplicationContextListenerInitializer implements ServletContextL
 }
 ```
 
-WebApplicationContextListener 优先级比较器
+WebApplicationContextListener 优先级比较器:
 
 ```java
 public class WebApplicationContextListenerOrdinalComparator implements Comparator<WebApplicationContextListener> {
