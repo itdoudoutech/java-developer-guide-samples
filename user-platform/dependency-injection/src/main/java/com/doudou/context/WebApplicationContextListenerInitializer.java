@@ -23,7 +23,7 @@ public class WebApplicationContextListenerInitializer implements ServletContextL
         // 分发 WebApplicationContextListener
         for (WebApplicationContextListener contextListener : contextListeners) {
             contextListener.contextInitialized(sce);
-            logger.info(contextListener.getClass().getSimpleName() + "Listener contextInitialized success");
+            logger.info(contextListener.getClass().getSimpleName() + " Listener contextInitialized success");
         }
     }
 
