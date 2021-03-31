@@ -4,6 +4,7 @@
 + [0x01：实现依赖注入和依赖查找，对密码和手机号进行格式校验](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x01)
 + [0x02：整合 Jolokia，扩展 microprofile config 的实现](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x02)
 + [0x03：完善 DI & configuration 模块，使其脱离 web.xml](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x03)
++ [0x04：完善 rest-client & reactive-messaging 模块](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x04)
 
 ## 0x00
 ### 目标
@@ -529,6 +530,20 @@ public class ConfigSourceInitializeListener implements WebApplicationContextList
 }
 ```
 
+## 0x04
+### 目标
 
++ [ ] 完善 rest-client 模块
++ [ ] 完善 reactive-messaging 模块
+
+### 实现
+
++ [ ] 完善 rest-client 模块
+  
+  TODO...
+  
++ [ ] 完善 reactive-messaging 模块
+  
+  TODO...
 
 
