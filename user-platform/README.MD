@@ -746,7 +746,7 @@ public class DefaultPublisherTest {
 }
 ```
 
-总共发布 4 次 Event，当发布第 2 个的时候，我们直接取消，看情况是否正常。
+总共发布 4 次 Event，当发布第 3 个的时候，我们直接取消，看情况是否正常。
 
 ```java
 @Test
@@ -793,7 +793,7 @@ public void testPublisherWithCompleteCondition() {
 严重: The data subscription was completed, current data[4] should not be published again!
 ```
 
-总共发布 5 次 Event，因为设置的 maxRequestCount 为 3，所以在发布第 3 个 Event 之后将 maxRequestCount 重置为 100，看情况是否正常。
+总共发布 6 次 Event，因为设置的 maxRequestCount 为 3，所以在发布第 3 个 Event 之后将 maxRequestCount 重置为 100，看情况是否正常。
 
 ```java
 @Test
