@@ -11,13 +11,9 @@ public class Question_485 {
     public int findMaxConsecutiveOnes(int[] nums) {
         int max = 0, tmp = 0;
         for (int num : nums) {
-            if (num == 1) {
-                tmp += 1;
-            } else {
-                max = Math.max(max, tmp);
-                tmp = 0;
-            }
+            tmp = num == 1 ? tmp + 1 : 0;
+            max = Math.max(max, tmp);
         }
-        return Math.max(max, tmp);
+        return max;
     }
 }
