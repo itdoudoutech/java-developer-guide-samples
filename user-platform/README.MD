@@ -534,7 +534,7 @@ public class ConfigSourceInitializeListener implements WebApplicationContextList
 ### 目标
 
 + [ ] 完善 rest-client 模块
-+ [ ] 完善 reactive-messaging 模块
++ [x] 完善 reactive-messaging 模块
 
 ### 实现
 
@@ -542,8 +542,290 @@ public class ConfigSourceInitializeListener implements WebApplicationContextList
   
   TODO...
   
-+ [ ] 完善 reactive-messaging 模块
++ [x] 完善 reactive-messaging 模块
   
-  TODO...
+reactive-messaging 可以简单的理解为订阅发布模式。先了解下其主要的 API。
+
+```java
+package org.reactivestreams;
+
+public interface Publisher<T> {
+    // 添加订阅者
+    void subscribe(Subscriber<? super T> s);
+}
+
+public interface Subscriber<T> {
+    // 关联 Subscription
+    void onSubscribe(Subscription s);
+    
+    // 接收 Publisher Event
+    void onNext(T t);
+    
+    // 失败情况，Publisher 不再发送 Event
+    void onError(Throwable t);
+    
+    // 成功处理完所有 Event，Publisher 不再发送 Event
+    void onComplete();
+}
+
+public interface Subscription {
+
+    /**
+     * 发布通知前必须先调用此方法
+     * @param n Subscriber 最多接受的 Event 个数
+     */
+    void request(long n);
+    
+    // 通知 Publisher 不再向 Subscriber 发送 Event
+    void cancel();
+}
+
+public interface Processor<T, R> extends Subscriber<T>, Publisher<R> {}
+```
+
+这几个 API 都不复杂，设计基本做到了见名知意，不在过多解释其含义，简单说下其设计思路。
+
+Processor 集发布者和订阅者合二为一，目前暂未实现。
+
+其中不好理解的是 Subscription，我们可以将其看作是 Publisher 和 Subscriber 的中间纽带，`Subscription#request` 控制着 Subscriber 最多能接收到的 Event 个数，`Subscription#cancel` 负责通知 Publisher 不再继续向 Subscriber 发送 Event。
+
+注意，Subscription 和 Subscriber 是一一对应的，这点从 `Subscriber#onSubscribe` 可知。
+
+因此，我们要在 Subscriber#onNext 函数中获取到该订阅者可接收的 Event 阈值，当达到阈值时调用自身 `onComplete` 函数，故 Subscription 实现类中需要暴露 maxRequestCount 和 isCancel 的接口.
+
+Subscription 的实现如下：
+
+```java
+public class DefaultSubscription implements Subscription {
+
+    private long maxRequest = -1;
+
+    private boolean cancel = false;
+
+    @Override
+    public void request(long n) {
+        if (n < 1) {
+            throw new IllegalArgumentException("The number of elements to requests must be more than zero!");
+        }
+        this.maxRequest = n;
+    }
+
+    @Override
+    public void cancel() {
+        this.cancel = true;
+    }
+
+    public long getMaxRequest() {
+        return maxRequest;
+    }
+
+    public boolean isCancel() {
+        return cancel;
+    }
+}
+```
+
+Subscriber 持有一个 Subscription 引用，继续将 maxRequestCount 和 isCancel 的接口暴露出去，具体实现则委托给 Subscription 即可。
+
+Subscriber 的实现如下：
+
+```java
+public class DefaultSubscriber<T> implements Subscriber<T> {
+
+    protected Logger logger = Logger.getLogger(this.getClass().getName());
+
+    private DefaultSubscription subscription;
+
+    private boolean completed = false;
+
+    private long requestCount = 0;
+
+    @Override
+    public void onSubscribe(Subscription s) {
+        this.subscription = (DefaultSubscription) s;
+    }
+
+    @Override
+    public void onNext(T t) {
+
+        assertRequest();
+
+        long maxRequestCount = subscription.getMaxRequest();
+        if (requestCount == maxRequestCount && maxRequestCount < Long.MAX_VALUE) {
+            onComplete();
+            logger.warning(String.format("The number of requests is up to the max threshold[%d]," +
+                    " the data subscription is completed!", maxRequestCount));
+            return;
+        }
+
+        requestCount++;
+        logger.info("收到数据：" + t);
+    }
+
+
+    @Override
+    public void onError(Throwable t) {
+        logger.info("遇到异常：" + t);
+    }
+
+    @Override
+    public void onComplete() {
+        completed = true;
+        logger.info("收到数据完成");
+    }
+
+    public boolean isCanceled() {
+        return subscription.isCancel();
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    private void assertRequest() {
+        if (this.subscription.getMaxRequest() < 1) {
+            throw new IllegalStateException("the number of request must be initialized before " +
+                    "Subscriber#onNext(Object) method, please set the positive number to " +
+                    "Subscription#request(int) method on Publisher#subscribe(Subscriber) phase.");
+        }
+    }
+}
+```
+
+Publisher 则必须保存所有的 Subscriber，因此我们定义了一个 List，发布 Event 时则遍历该 List 以广播的形式通知出去即可，需要注意的是，广播时需要对 Subscriber 的状态做以下判定，canceled 和 completed 状态的的 Subscriber 不再继续发送 EVent。
+
+Publisher 的实现如下：
+
+```java
+public class DefaultPublisher<T> implements Publisher<T> {
+
+    protected Logger logger = Logger.getLogger(this.getClass().getName());
+
+    private final List<DefaultSubscriber<? super T>> subscribers = new LinkedList<>();
+
+    @Override
+    public void subscribe(Subscriber<? super T> s) {
+        DefaultSubscriber<? super T> defaultSubscriber = (DefaultSubscriber) s;
+        subscribers.add(defaultSubscriber);
+    }
+
+    public void publish(T data) {
+        subscribers.forEach(p -> {
+            if (p.isCompleted()) {
+                logger.severe("The data subscription was completed, This data should not be published again!");
+                return;
+            }
+
+            if (p.isCanceled()) { // Indicates that the Subscriber invokes Subscription#cancel() method.
+                logger.warning(String.format("The Subscriber has canceled the data subscription," +
+                        " current data[%s] will be ignored!", data));
+                return;
+            }
+        });
+
+        subscribers.stream().filter(p -> !p.isCanceled() && !p.isCompleted())
+                .forEach(subscriber -> subscriber.onNext(data));
+    }
+}
+```
+
+针对 Event 发布中被 cancel、completed、以及二次调用 `Subscription#request` 三种情况分别做测试。
+
+测试程序如下：
+
+```java
+public class DefaultPublisherTest {
+
+    private final DefaultPublisher<Integer> publisher = new DefaultPublisher<>();
+    private final DefaultSubscription subscription = new DefaultSubscription();
+    private final Subscriber<Integer> subscriber = new DefaultSubscriber<>();
+
+    private final long maxRequestCount = 3L;
+
+    ...
+}
+```
+
+总共发布 4 次 Event，当发布第 2 个的时候，我们直接取消，看情况是否正常。
+
+```java
+@Test
+public void testPublisherWithCancelCondition() {
+    subscription.request(maxRequestCount);
+    subscriber.onSubscribe(subscription);
+    publisher.subscribe(subscriber);
+
+    for (int i = 0; i < 4; i++) {
+        if (i == 2) {
+            subscription.cancel();
+        }
+        publisher.publish(i);
+    }
+}
+
+## 日志如下：
+信息: 收到数据：0
+信息: 收到数据：1
+警告: The Subscriber has canceled the data subscription, current data[2] will be ignored!
+警告: The Subscriber has canceled the data subscription, current data[3] will be ignored!
+```
+
+总共发布 5 次 Event，但我们设置的 maxRequestCount 为 3，看情况是否正常。
+
+```java
+@Test
+public void testPublisherWithCompleteCondition() {
+    subscription.request(maxRequestCount);
+    subscriber.onSubscribe(subscription);
+    publisher.subscribe(subscriber);
+
+    for (int i = 0; i < 5; i++) {
+        publisher.publish(i);
+    }
+}
+
+## 日志如下：
+信息: 收到数据：0
+信息: 收到数据：1
+信息: 收到数据：2
+信息: 收到数据完成
+警告: The number of requests is up to the max threshold[3], the data subscription is completed!
+严重: The data subscription was completed, current data[4] should not be published again!
+```
+
+总共发布 5 次 Event，因为设置的 maxRequestCount 为 3，所以在发布第 3 个 Event 之后将 maxRequestCount 重置为 100，看情况是否正常。
+
+```java
+@Test
+public void testPublisherWithRequestAgainCondition() {
+    subscription.request(maxRequestCount);
+    subscriber.onSubscribe(subscription);
+    publisher.subscribe(subscriber);
+
+    for (int i = 0; i < 6; i++) {
+        if (i == 4) {
+            subscription.request(100L);
+        }
+        publisher.publish(i);
+    }
+}
+
+## 日志如下：
+信息: 收到数据：0
+信息: 收到数据：1
+信息: 收到数据：2
+信息: 收到数据完成
+警告: The number of requests is up to the max threshold[3], the data subscription is completed!
+严重: The data subscription was completed, current data[4] should not be published again!
+严重: The data subscription was completed, current data[5] should not be published again!
+```
+
+
+
+
+
+
+
+
 
 

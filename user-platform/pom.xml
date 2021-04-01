@@ -11,9 +11,10 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>mvc</module>
-        <module>configuration</module>
         <module>dependency-injection</module>
+        <module>configuration</module>
+        <module>mvc</module>
+        <module>reactive-messaging</module>
         <module>user-web</module>
     </modules>
 
