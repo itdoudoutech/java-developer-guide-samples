@@ -17,24 +17,34 @@
 package com.doudou.rest.client;
 
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedMap;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
 
-class HttpGetInvocation extends AbstractHttpInvocation {
+class HttpPostInvocation extends AbstractHttpInvocation {
 
-    HttpGetInvocation(URI uri, MultivaluedMap<String, Object> headers) {
+    private final Entity<?> entity;
+
+    HttpPostInvocation(URI uri, MultivaluedMap<String, Object> headers, Entity<?> entity) {
         super(uri, headers);
+        this.entity = entity;
     }
 
     @Override
     protected String getMethod() {
-        return HttpMethod.GET;
+        return HttpMethod.POST;
     }
 
     @Override
     protected void process(HttpURLConnection connection) throws IOException {
-
+        connection.setDoOutput(true);
+        OutputStream ops = connection.getOutputStream();
+        OutputStreamWriter osw = new OutputStreamWriter(ops, "UTF-8");
+        osw.write(entity.getEntity().toString());
+        osw.flush();
     }
 }

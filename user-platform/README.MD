@@ -533,15 +533,71 @@ public class ConfigSourceInitializeListener implements WebApplicationContextList
 ## 0x04
 ### 目标
 
-+ [ ] 完善 rest-client 模块
++ [x] 完善 rest-client 模块
 + [x] 完善 reactive-messaging 模块
 
 ### 实现
 
-+ [ ] 完善 rest-client 模块
-  
-  TODO...
-  
++ [x] 完善 rest-client 模块
+
+请求的逻辑需要在 `javax.ws.rs.client.Invocation` 中处理，而不同类型的请求处理逻辑可能会有些许不同，故抽象出 `com.doudou.rest.client.AbstractHttpInvocation` 类。来处理公共逻辑部分，不同的逻辑则下放到具体子类去实现。
+
+验证时需要在本地启动一个 rest 接口，方便起见，我直接写了一个最简单的 spring-boot 工程，可直接运行`/java-developer-guide-samples/spring-boot-samples/spring-boot-web-samples/src/main/java/com/doudou/Application`来启动 rest 接口。
+
+spring-boot-web-samples 工程的 HelloWorldController:
+
+```
+@RestController
+@RequestMapping("/")
+public class HelloController {
+
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello World";
+    }
+
+    @PostMapping("/hi")
+    public String hi(String name) {
+        return "Hi," + name + "!";
+    }
+}
+```
+
+接着启动本工程下的 `com.doudou.rest.RestClientTest` 测试用例既可。
+
+```java
+package com.doudou.rest;
+
+public class RestClientTest {
+
+    @Test
+    public void testGetMethod() {
+        Client client = ClientBuilder.newClient();
+        Response response = client
+                .target("http://127.0.0.1:8080/hello")      // WebTarget
+                .request() // Invocation.Builder
+                .get();                                     //  Response
+        String content = response.readEntity(String.class);
+        System.out.println(content);
+    }
+
+    @Test
+    public void testPostMethod() {
+        Client client = ClientBuilder.newClient();
+        Response response = client
+                .target("http://127.0.0.1:8080/hi")      // WebTarget
+                .request() // Invocation.Builder
+                .post(Entity.json("name=admin"));                                     //  Response
+        String content = response.readEntity(String.class);
+        System.out.println(content);
+    }
+}
+
+## 输出如下：
+信息: get method: Hello World
+信息: post method: Hi,admin!
+```
+
 + [x] 完善 reactive-messaging 模块
   
 reactive-messaging 可以简单的理解为订阅发布模式。先了解下其主要的 API。
