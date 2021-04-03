@@ -36,9 +36,8 @@ public class DefaultPublisher<T> implements Publisher<T> {
                         " current data[%s] will be ignored!", data));
                 return;
             }
-        });
 
-        subscribers.stream().filter(p -> !p.isCanceled() && !p.isCompleted())
-                .forEach(subscriber -> subscriber.onNext(data));
+            p.onNext(data);
+        });
     }
 }

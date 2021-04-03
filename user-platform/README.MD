@@ -712,7 +712,7 @@ public class DefaultPublisher<T> implements Publisher<T> {
     public void publish(T data) {
         subscribers.forEach(p -> {
             if (p.isCompleted()) {
-                logger.severe("The data subscription was completed, This data should not be published again!");
+                logger.severe(String.format("The data subscription was completed, current data[%s] should not be published again!", data));
                 return;
             }
 
@@ -721,10 +721,9 @@ public class DefaultPublisher<T> implements Publisher<T> {
                         " current data[%s] will be ignored!", data));
                 return;
             }
-        });
 
-        subscribers.stream().filter(p -> !p.isCanceled() && !p.isCompleted())
-                .forEach(subscriber -> subscriber.onNext(data));
+            p.onNext(data);
+        });
     }
 }
 ```
