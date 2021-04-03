@@ -540,16 +540,24 @@ public class ConfigSourceInitializeListener implements WebApplicationContextList
 
 + [x] 完善 rest-client 模块
 
-请求的逻辑需要在 `javax.ws.rs.client.Invocation` 中处理，而不同类型的请求处理逻辑可能会有些许不同，故抽象出 `com.doudou.rest.client.AbstractHttpInvocation` 类。来处理公共逻辑部分，不同的逻辑则下放到具体子类去实现。
+请求的逻辑需要在 `javax.ws.rs.client.Invocation` 中处理，而不同类型的请求处理逻辑可能会有些许不同，故抽象出 `com.doudou.rest.client.AbstractHttpInvocation` 类来处理公共逻辑部分，不同的逻辑则下放到具体子类中去实现。
+
+```java
+AbstractHttpInvocation
+  - HttpGetInvocation
+  - HttpPostInvocation
+```
 
 验证时需要在本地启动一个 rest 接口，方便起见，我直接写了一个最简单的 spring-boot 工程，可直接运行`/java-developer-guide-samples/spring-boot-samples/spring-boot-web-samples/src/main/java/com/doudou/Application`来启动 rest 接口。
 
 spring-boot-web-samples 工程的 HelloWorldController:
 
-```
+```java
+package com.doudou;
+
 @RestController
 @RequestMapping("/")
-public class HelloController {
+public class HelloWorldController {
 
     @GetMapping("/hello")
     public String hello() {
