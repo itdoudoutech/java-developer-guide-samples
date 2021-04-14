@@ -5,6 +5,7 @@
 + [0x02：整合 Jolokia，扩展 microprofile config 的实现](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x02)
 + [0x03：完善 DI & configuration 模块，使其脱离 web.xml](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x03)
 + [0x04：完善 rest-client & reactive-messaging 模块](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x04)
++ [0x05：完善 my-cache 模块](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x05)
 
 ## 0x00
 ### 目标
@@ -882,7 +883,14 @@ public void testPublisherWithRequestAgainCondition() {
 严重: The data subscription was completed, current data[4] should not be published again!
 严重: The data subscription was completed, current data[5] should not be published again!
 ```
+## 0x05
+### 目标
 
++ [x] 完善 my-cache 模块
+   + 提供一套抽象 API 实现对象的序列化和反序列化
+   + 通过 Lettuce 实现一套 Redis CacheManager 以及 Cache
+
+### 实现
 
 
 
