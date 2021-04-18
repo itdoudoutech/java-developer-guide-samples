@@ -609,6 +609,7 @@ public class RestClientTest {
 
 + [x] 完善 reactive-messaging 模块
   
+
 reactive-messaging 可以简单的理解为订阅发布模式。先了解下其主要的 API。
 
 ```java
@@ -891,6 +892,118 @@ public void testPublisherWithRequestAgainCondition() {
    + 通过 Lettuce 实现一套 Redis CacheManager 以及 Cache
 
 ### 实现
+
++ 提供一套抽象 API 实现对象的序列化和反序列化
+
+抽象出序列化 & 反序列化接口 `SerializeProvider`，并提供一个默认实现 `DefaultSerializeProvider`。
+
+```java
+/**
+ * 序列化 & 反序列化
+ *
+ * @param <S> 原始数据类型
+ * @param <T> 目标数据类型
+ */
+public interface SerializeProvider<S, T> {
+
+    /**
+     * 序列化
+     *
+     * @param source
+     * @return
+     */
+    T serialize(S source) throws CacheException;
+
+    /**
+     * 反序列化
+     *
+     * @param target
+     * @return
+     */
+    S deserialize(T target) throws CacheException;
+}
+```
+
+```java
+public class DefaultSerializeProvider implements SerializeProvider<Serializable, byte[]> {
+
+    @Override
+    public byte[] serialize(Serializable source) throws CacheException {
+        byte[] bytes;
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream)
+        ) {
+            // Key -> byte[]
+            objectOutputStream.writeObject(source);
+            objectOutputStream.flush();
+            bytes = outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new CacheException(e);
+        }
+        return bytes;
+    }
+
+    @Override
+    public Serializable deserialize(byte[] target) throws CacheException {
+        if (target == null) {
+            return null;
+        }
+        Serializable value;
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(target);
+             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)
+        ) {
+            // byte[] -> Value
+            value = (Serializable) objectInputStream.readObject();
+        } catch (Exception e) {
+            throw new CacheException(e);
+        }
+        return value;
+    }
+}
+```
+
+如何接入：
+
+JedisCache 接入，哈哈哈，简单粗暴直接。
+
+```java
+private final SerializeProvider<Serializable, byte[]> serializeProvider;
+
+    public JedisCache(CacheManager cacheManager, String cacheName,
+                      Configuration<K, V> configuration, Jedis jedis) {
+        super(cacheManager, cacheName, configuration);
+        this.jedis = jedis;
+        this.serializeProvider = new DefaultSerializeProvider();
+    }
+
+    @Override
+    protected boolean containsEntry(K key) throws CacheException, ClassCastException {
+        byte[] keyBytes = serializeProvider.serialize(key);
+        return jedis.exists(keyBytes);
+    }
+
+    ...
+```
+
++ 通过 Lettuce 实现一套 Redis CacheManager 以及 Cache
+
+Lettuce 通过 `io.lettuce.core.RedisClient` 来操作 Redis。
+
+具体实现参考以下代码：
+
++ `com.doudou.cache.redis.lettuce.LettuceCacheManager`
++ `com.doudou.cache.redis.lettuce.LettuceCache`
++ `com.doudou.cache.redis.lettuce.DefaultRedisCodec`
+
+#### TODO
+
+自定义序列化反序列化 API 时发现写进 Redis 的 key 和 value 可读性是很差的。
+
+![](https://raw.githubusercontent.com/coderlmm/java-developer-guide-samples/main/docs/img/redis-key-serializable.png)
+
+我想是因为 `ByteArrayOutputStream#writeObject()` 在字节数组前面加了魔数，比如 String 类型的对象前面会加上 [-84, -19, 0, 5, 116, 0, 9]，事实上这个是不影响程序使用的，但是在 Redis 客户端查看时是极其不友好的。暂时未找到优雅的解决方案。
+
+
 
 
 
