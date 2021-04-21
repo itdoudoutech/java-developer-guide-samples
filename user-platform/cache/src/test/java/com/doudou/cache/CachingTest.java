@@ -16,13 +16,10 @@
  */
 package com.doudou.cache;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.doudou.cache.event.TestCacheEntryListener;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.async.RedisStringAsyncCommands;
 import io.lettuce.core.api.sync.RedisCommands;
-import com.doudou.cache.event.TestCacheEntryListener;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -148,10 +145,5 @@ public class CachingTest {
         System.out.println(sync.get("name"));
         connection.close();
         client.shutdown();
-
-        String admin = JSON.toJSONString("admin");
-        System.out.println(admin);
-        JSONObject object = JSON.parseObject(admin);
-        System.out.println(object.toString());
     }
 }

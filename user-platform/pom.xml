@@ -57,6 +57,8 @@
         <lettuce.version>6.1.0.RELEASE</lettuce.version>
         <jedis.version>3.5.2</jedis.version>
 
+        <okhttp.version>4.9.0</okhttp.version>
+        <fastjson.version>1.2.73</fastjson.version>
         <lombok.version>1.16.18</lombok.version>
 
         <!-- Testing 版本 -->
@@ -184,6 +186,13 @@
                 <version>${commons-dbcp.version}</version>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+
             <!-- Java DB -->
             <dependency>
                 <groupId>com.h2database</groupId>
@@ -246,6 +255,13 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
             </dependency>
 
             <!-- Apache ActiveMQ -->

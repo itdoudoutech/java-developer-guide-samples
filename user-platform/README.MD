@@ -6,6 +6,7 @@
 + [0x03：完善 DI & configuration 模块，使其脱离 web.xml](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x03)
 + [0x04：完善 rest-client & reactive-messaging 模块](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x04)
 + [0x05：完善 my-cache 模块](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x05)
++ [0x06：接入 Github/Gitee OAuth2 认证](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x06)
 
 ## 0x00
 ### 目标
@@ -1004,8 +1005,88 @@ Lettuce 通过 `io.lettuce.core.RedisClient` 来操作 Redis。
 我想是因为 `ByteArrayOutputStream#writeObject()` 在字节数组前面加了魔数，比如 String 类型的对象前面会加上 [-84, -19, 0, 5, 116, 0, 9]，事实上这个是不影响程序使用的，但是在 Redis 客户端查看时是极其不友好的。暂时未找到优雅的解决方案。
 
 
+## 0x06
+### 目标
 
++ [x] 使用 Spring Boot 来实现一个整合 Gitee 或者 Github OAuth2 认证
 
+### 实现
+
++ 使用 Spring Boot 来实现一个整合 Gitee 或者 Github OAuth2 认证
+
+本次作业实现并没有使用 Spring Boot，而是直接使用了之前的 user-web 和 configuration 模块对接 GitHub OAuth2 认证。
+
+为了使 Controller 支持多方法映射，因此修改了 `FrontControllerServlet#service` 和 `FrontControllerServlet#initHandleMethods` 的实现，以支持单个 Controller 中的多方法映射。
+
+OAuth2 认证流程图如下：
+
+![](https://raw.githubusercontent.com/coderlmm/java-developer-guide-samples/main/docs/img/oauth_process.png)
+
+主要逻辑代码实现如下：
+
+```java
+@Path("/")
+public class OAuthApplicationController implements Controller {
+
+    private final ConfigProviderResolver provider = ConfigProviderResolver.instance();
+    private final Config providerConfig = provider.getConfig();
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
+
+    private static final String GET_TOKEN_API = "https://github.com/login/oauth/access_token";
+    private static final String GET_USER_INFO_API = " https://api.github.com/user";
+    private static final String CLIENT_ID_KEY = "client_id";
+    private static final String CLIENT_SECRETS_KEY = "client_secrets";
+
+    @GET
+    @Path("/login")
+    public String login(HttpServletRequest request, HttpServletResponse response) {
+        String client_id = providerConfig.getValue(CLIENT_ID_KEY, String.class);
+        request.setAttribute("client_id", client_id);
+        return "login-oauth.jsp";
+    }
+
+    @GET
+    @Path("/oauth")
+    public String oauth(HttpServletRequest request, HttpServletResponse response) {
+        String code = request.getParameter("code");
+
+        // 获取 token
+        Map<String, String> params = new HashMap<>();
+        params.put("client_id", providerConfig.getValue(CLIENT_ID_KEY, String.class));
+        params.put("client_secret", providerConfig.getValue(CLIENT_SECRETS_KEY, String.class));
+        params.put("code", code);
+        String result = OkHttpUtils.doPostWithParams(GET_TOKEN_API, params);
+        logger.info("获取 GitHub token result: " + result);
+
+        Map<String, String> resultMap = OkHttpUtils.resolveParamsByUrl("?" + result);
+        String token = resultMap.get("access_token");
+
+        // 获取个人信息
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "token " + token);
+        String userInfo = OkHttpUtils.doGetWithHeaders(GET_USER_INFO_API, headers);
+        logger.info("user info is: " + userInfo);
+
+        JSONObject userObject = JSONObject.parseObject(userInfo);
+        String name = userObject.getString("name");
+        String avatar_url = userObject.getString("avatar_url");
+        request.setAttribute("avatar_url", avatar_url);
+        request.setAttribute("name", name);
+
+        return "login-oauth-success.jsp";
+    }
+}
+```
+
+验证步骤：
+
+安全起见，我将 `java-developer-guide-samples/user-platform/user-web/src/main/resources/META-INF/config.properties` 中的 client_id 以及 client_secrets 配置信息去掉了，因此你需要配置一下。
+
+启动工程，访问 `http://localhost:8080/login` 页面，点击「click here」授权 GitHub 登录，之后就会看到如下页面了。
+
+结果如下：
+
+![](https://raw.githubusercontent.com/coderlmm/java-developer-guide-samples/main/docs/img/oauth_login_success.png)
 
 
 
