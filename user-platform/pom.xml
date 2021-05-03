@@ -18,6 +18,7 @@
         <module>rest-client</module>
         <module>user-web</module>
         <module>cache</module>
+        <module>spring-security</module>
     </modules>
 
     <properties>
@@ -60,6 +61,9 @@
         <okhttp.version>4.9.0</okhttp.version>
         <fastjson.version>1.2.73</fastjson.version>
         <lombok.version>1.16.18</lombok.version>
+
+        <!-- Spring 依赖版本 -->
+        <spring-boot.version>2.4.5.1</spring-boot.version>
 
         <!-- Testing 版本 -->
         <junit.version>4.13</junit.version>

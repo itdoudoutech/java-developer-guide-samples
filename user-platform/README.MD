@@ -1101,8 +1101,58 @@ public class OAuthApplicationController implements Controller {
 
 ### 实现
 
-TODO...
+本次作业代码在 spring-security 模块中实现。
 
++ 多 WebSecurityConfigurerAdapter 版本
 
+打开配置文件 application.properties 中的 web.security.configurer.adapter 配置。
 
+其中 WebSecurityConfigurerAdapter1 设置 `/hello` 需要登录权限，Order 配置为 100，WebSecurityConfigurerAdapter2 设置 `/hello` 不需要登录权限，Order 配置为 200。
 
+结果如下：
+
+```bash
+$ curl http://localhost:9090/hello\?name\=admin
+
+{"timestamp":"2021-05-03T15:52:52.140+00:00","status":403,"error":"Forbidden","message":"","path":"/hello"}
+```
+
+将 WebSecurityConfigurerAdapter1 的 order 设置为 1000，其余不做改动，再次做测试。
+
+结果如下：
+
+```bash
+$ curl http://localhost:9090/hello\?name\=admin
+
+{"msg":"操作成功","result":true,"data":"Hello, admin"}
+```
+
+**由此得知，Order 小的配置生效。**
+
++ 单 WebSecurityConfigurerAdapter 版本
+
+注释调配置文件 application.properties 中的 web.security.configurer.adapter 配置。
+
+其中 MyWebSecurityConfigurerImpl1 设置 `/hello` 需要登录权限，Order 配置为 100，MyWebSecurityConfigurerImpl2 设置 `/hello` 不需要登录权限，Order 配置为 200。
+
+结果如下：
+
+```bash
+$ curl http://localhost:9090/hello\?name\=admin
+
+{"msg":"操作成功","result":true,"data":"Hello, admin"}
+```
+
+将 MyWebSecurityConfigurerImpl1 的 order 设置为 1000，其余不做改动，再次做测试。
+
+结果如下：
+
+```bash
+$ curl http://localhost:9090/hello\?name\=admin
+
+{"timestamp":"2021-05-03T15:58:34.541+00:00","status":403,"error":"Forbidden","message":"","path":"/hello"}
+```
+
+**由此得知，Order 大的配置生效。**
+
+以上，感觉这次的作业有点不知所措，后面继续完善。
