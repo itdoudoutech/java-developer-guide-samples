@@ -886,6 +886,7 @@ public void testPublisherWithRequestAgainCondition() {
 严重: The data subscription was completed, current data[4] should not be published again!
 严重: The data subscription was completed, current data[5] should not be published again!
 ```
+
 ## 0x05
 ### 目标
 
@@ -1005,7 +1006,6 @@ Lettuce 通过 `io.lettuce.core.RedisClient` 来操作 Redis。
 
 我想是因为 `ByteArrayOutputStream#writeObject()` 在字节数组前面加了魔数，比如 String 类型的对象前面会加上 [-84, -19, 0, 5, 116, 0, 9]，事实上这个是不影响程序使用的，但是在 Redis 客户端查看时是极其不友好的。暂时未找到优雅的解决方案。
 
-
 ## 0x06
 ### 目标
 
@@ -1088,7 +1088,6 @@ public class OAuthApplicationController implements Controller {
 结果如下：
 
 ![](https://raw.githubusercontent.com/coderlmm/java-developer-guide-samples/main/docs/img/oauth_login_success.png)
-
 
 ## 0x07
 ### 目标
