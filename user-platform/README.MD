@@ -1130,7 +1130,7 @@ $ curl http://localhost:9090/hello\?name\=admin
 
 + 单 WebSecurityConfigurerAdapter 版本
 
-注释调配置文件 application.properties 中的 web.security.configurer.adapter 配置。
+注释掉配置文件 application.properties 中的 web.security.configurer.adapter 配置。
 
 其中 MyWebSecurityConfigurerImpl1 设置 `/hello` 需要登录权限，Order 配置为 100，MyWebSecurityConfigurerImpl2 设置 `/hello` 不需要登录权限，Order 配置为 200。
 
