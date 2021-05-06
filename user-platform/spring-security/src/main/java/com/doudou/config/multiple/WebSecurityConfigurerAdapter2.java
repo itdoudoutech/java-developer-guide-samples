@@ -7,15 +7,19 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
+import java.util.logging.Logger;
+
 @Order(200)
 @Configuration
 @EnableWebSecurity
 @ConditionalOnProperty(name = "web.security.configurer.adapter", havingValue = "multiple")
 public class WebSecurityConfigurerAdapter2 extends WebSecurityConfigurerAdapter {
 
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        System.out.println("WebSecurityConfigurerAdapter2 order = 200");
+        logger.info("WebSecurityConfigurerAdapter2 order = 200");
         http.csrf().disable()
                 .authorizeRequests() // 设置权限
                 .antMatchers("/hello").permitAll(); // 放行
