@@ -18,7 +18,7 @@ public class OkHttpUtils {
     private static final Map<String, String> DEFAULT_HEADERS = new HashMap<>();
 
     static {
-        // DEFAULT_HEADERS.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36");
+        DEFAULT_HEADERS.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36");
     }
 
     public static Map<String, String> resolveParamsByUrl(String url) {
@@ -116,6 +116,7 @@ public class OkHttpUtils {
             urlWithParam += params.keySet().stream().map(key -> key + "=" + params.get(key))
                     .collect(Collectors.joining("&", "?", ""));
         }
+        headers.putAll(DEFAULT_HEADERS);
         Request.Builder requestBuilder = new Request.Builder().url(urlWithParam);
         return sendRequest(headers, requestBuilder);
     }
@@ -133,6 +134,7 @@ public class OkHttpUtils {
         for (Map.Entry<String, String> entity : params.entrySet()) {
             formBuilder.add(entity.getKey(), defaultValue(entity.getValue(), ""));
         }
+        headers.putAll(DEFAULT_HEADERS);
         Request.Builder requestBuilder = new Request.Builder().url(url).post(formBuilder.build());
         return sendRequest(headers, requestBuilder);
     }
