@@ -8,6 +8,8 @@
 + [0x05：完善 my-cache 模块](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x05)
 + [0x06：接入 Github/Gitee OAuth2 认证](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x06)
 + [0x07：解决多个 WebSecurityConfigurerAdapter 冲突问题](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x07)
++ [0x08：Spring Cache 与 Redis 整合](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x08)
++ [0x09：完善 MyBatis 实现](https://github.com/coderlmm/java-developer-guide-samples/tree/main/user-platform#0x09)
 
 ## 0x00
 ### 目标
@@ -1155,3 +1157,24 @@ $ curl http://localhost:9090/hello\?name\=admin
 **由此得知，Order 大的配置生效。**
 
 以上，感觉这次的作业有点不知所措，后面继续完善。
+
+## 0x08
+### 目标
+
++ [ ] 如何清除某个 Spring Cache 所有的 Keys 关联的对象
+    + 如果 Redis 中心化方案，Redis + Sentinel
+    + 如果 Redis 去中心化方案，Redis Cluster
++ [ ] 如何将 RedisCacheManager 与 @Cacheable 注解打通
+
+### 实现
+
+TODO...
+
+## 0x09
+### 目标
+
++ [ ] 完善 @com.doudou.user.mybatis.annotation.Enable MyBatis 实现，尽可能多地注入 org.mybatis.spring.SqlSessionFactoryBean 中依赖的组件
+
+### 实现
+
+TODO...
